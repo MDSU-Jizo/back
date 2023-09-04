@@ -14,6 +14,9 @@ services:
     # Create a volume to persist database data
     volumes:
       - pgdata:/var/lib/postgresql/data
+    # Link the network to the container
+    networks:
+      - backend
   # The app service
   jizo:
     # Rename it jizo to avoir being named `jizo-1`
@@ -34,6 +37,12 @@ services:
     # Cannot be launched without the db service fully working
     depends_on:
       - db
+    # Link the network to the container
+    networks:
+      - backend
 # List of named volumes
 volumes:
   pgdata:
+# List of networks
+networks:
+  backend:
