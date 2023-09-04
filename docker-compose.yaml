@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  # The database service
+  db:
+    # Using the postgreSQL official image
+    image: postgres
+    # Rename it postgres to avoid being named 'db-1'
+    container_name: postgres
+    # Define every required environment variables
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    # Create a volume to persist database data
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  # The app service
+  jizo:
+    # Rename it jizo to avoir being named `jizo-1`
+    container_name: jizo
+    # Point to the Dockerfile used for the build
+    build:
+      # Dockerfile which is located in the same directory as the docker-compose.yaml
+      context: .
+    # Exposing ports
+    ports:
+      - "8000:8000"
+    # Mount the volume
+    volumes:
+      - .:/jizo
+    # Command used to run the server
+    command:
+      python manage.py runserver 0.0.0.0:8000
+    # Cannot be launched without the db service fully working
+    depends_on:
+      - db
+# List of named volumes
+volumes:
+  pgdata:
