@@ -24,6 +24,12 @@ Build the project in detached mode and start the container.
 docker compose up --build -d 
 ```
 
+## How to build in production
+
+```shell
+docker compose -f docker-compose.prod.yaml up --build -d
+```
+
 
 ## Connect to PostgresSQL using CLI
 
