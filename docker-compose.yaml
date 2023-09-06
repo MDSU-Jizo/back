@@ -46,64 +46,97 @@ services:
     # Link the network to the container
     networks:
       - backend
+    # Set the type of logging
     logging:
       driver: "json-file"
+    # Declare variable that will be used in the container
     environment:
       - LOGSTASH_HOST=logstash
+    # Hot reload (does not work, gotta work on it)
     restart: always
 
+  # data indexer
   elastic:
     environment:
+      # Remove the loggin form
+      # NOT SECURE, OK in DEV but not in PROD env
       xpack.security.enabled: false
-#      xpack.security.autoconfiguration.enabled: false
+      # type of cluster
       discovery.type: single-node
+      # Heap Size
+      # Should not be overriden as followed in production
       ES_JAVA_OPTS: -Xms1g -Xmx1g
     image: elasticsearch:8.9.0
+    # Rename the container
     container_name: elastic
+    # Persist data in volume
     volumes:
       -  elastic_data:/home/src/app/elasticsearch/data/
+    # Bind ports
     ports:
       - "9200:9200"
+    # Link container to a network
     networks:
-      - backend
+      - ekl
 
+  # Log collector
   logstash:
     image: logstash:8.9.0
+    # Rename the container
     container_name: logstash
+    # Persist data in volume
     volumes:
       - ./logstash/logstash.conf:/logstash_dir/logstash.conf
+    # Set a command for logstash to read config file
     command: logstash -f /logstash_dir/logstash.conf
+    # Set the dependence to elastic container
     depends_on:
       - elastic
+    # Bind ports
     ports:
       - "5959:5959"
+    # Link container to a network
     networks:
-      - backend
+      - ekl
 
+  # Dashboard / UI to visualize logs
   kibana:
     image: kibana:8.9.0
+    # Rename the container
     container_name: kibana
+    # Bind ports
     ports:
       - "5601:5601"
+    # Set the dependence to elastic container
     depends_on:
       - elastic
+    # Link container to a network
     networks:
-      - backend
+      - elk
+    # Declare variable that will be used in the container
     environment:
       - ELASTICSEARCH_URL=http://elastic:9200
 
+  # Log centralizer
   filebeat:
+    # Rename the container
     container_name: filebeat
     image: filebeat:latest
+    # Set a user as root since this is the role privilege needed to make it work
     user: root
+    # The folder where is located its Dockerfile
     build:
       context: .
       dockerfile: filebeat/Dockerfile
+      # Send an argument its Dockerfile needs
       args:
         ELASTIC_VERSION: 8.9.1
+    # Persist data in volume
     volumes:
+      # Type of bind
       - ./filebeat/filebeat.yaml:/usr/share/filebeat/filebeat.yaml:ro
       - logs_volume:/home/src/app/logs
+      # Another way to define a bind
       - type: bind
         source: /var/lib/docker/containers
         target: /var/lib/docker/containers
@@ -112,14 +145,18 @@ services:
         source: /var/run/docker.sock
         target: /var/run/docker.sock
         read_only: true
+    # Command that tells filebeat which file it should use as config
     command: filebeat -e -c /usr/share/filebeat/filebeat.yaml -strict.perms=false
+    # Dependencies
     depends_on:
       - jizo
       - elastic
       - kibana
+    # Link container to a network
     networks:
-      - backend
+      - ekl
 # List of named volumes
+# Allow to persist the volume even if the containers are down
 volumes:
   pgdata:
   static_volume:
@@ -128,4 +165,4 @@ volumes:
 # List of networks
 networks:
   backend:
-    driver: bridge
+  elk:

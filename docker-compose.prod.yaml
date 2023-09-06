@@ -2,7 +2,7 @@ version: "3.8"
 services:
   # The database service
   db:
-    # Using the postgreSQL official image
+    # Name the image
     image: postgres
     # Rename it postgres to avoid being named 'db-1'
     container_name: postgres
@@ -23,12 +23,13 @@ services:
       - backend
   # The app service
   jizo:
-    # Rename it jizo to avoir being named `jizo-1`
+    # Rename it jizo to avoid being named `jizo-1`
     container_name: jizo
+    # Rename the image
     image: jizo_backend
-    # Point to the dev.Dockerfile used for the build
+    # Point to the prod.Dockerfile used for the build
     build:
-      # dev.Dockerfile which is located in the same directory as the docker-compose.yaml
+      # prod.Dockerfile which is located in the same directory as the docker-compose.yaml
       context: .
       dockerfile: docker/prod.Dockerfile
     # Exposing ports
@@ -47,19 +48,28 @@ services:
     # Link the network to the container
     networks:
       - backend
+  # The reserve proxy service
   nginx:
+    # Rename it to nginx to avoid being name `nginx-1`
     container_name: nginx
+    # Rename the image
     image: jizo_nginx
+    # The folder where is located its Dockerfile
     build: ./nginx
+    # Mount the volume
     volumes:
       - static_volume:/home/src/app/web/staticfiles
+    # Port listening
     ports:
       - "8000:80"
+    # Depends on the jizo container to work
     depends_on:
       - jizo
+    # Link the network
     networks:
       - backend
 # List of named volumes
+# Allow to persist the volume even if the containers are down
 volumes:
   pgdata:
   static_volume:
