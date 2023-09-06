@@ -8,8 +8,10 @@ then
       sleep 0.1
     done
 
-    rm ../.env
     echo "PostgreSQL started"
 fi
+
+python manage.py migrate
+rm ../.env
 
 exec "$@"
