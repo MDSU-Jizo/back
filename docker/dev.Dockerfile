@@ -11,10 +11,12 @@ LABEL author="https://github.com/Maengdok" \
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONBUFFERED 1
 
+# Switch to app directory so that everything runs from here
 WORKDIR app
 RUN mkdir /app/staticfiles
 
-# Switch to app directory so that everything runs from here
+# Install system dependencies
+RUN apk update
 
 # install dependencies
 RUN pip install --upgrade pip

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'docker_test.apps.DockerTestConfig',
 ]
 
 MIDDLEWARE = [
@@ -89,6 +90,8 @@ DATABASES = {
         'NAME': env('POSTGRES_DB'),
         'USER': env('POSTGRES_USER'),
         'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': env('POSTGRES_HOST'),
+        'PORT': env('POSTGRES_PORT'),
     }
 }
 
@@ -134,3 +137,61 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SEARCH_SETTINGS = {
+    'connections': {
+        'default': env('ELASTICSEARCH_URL'),
+        # 'backup': {
+        #     # all Elasticsearch init kwargs can be used here
+        #     'cloud_id': '{{ cloud_id }}'
+        # }
+    },
+    'indexes': {
+        'docker_test': {
+            'models': [
+                'FakeEntity',
+            ]
+        }
+    },
+    'settings': {
+        # batch size for ES bulk api operations
+        'chunk_size': 500,
+        # default page size for search results
+        'page_size': 25,
+        # set to True to connect post_save/delete signals
+        'auto_sync': True,
+        # List of models which will never auto_sync even if auto_sync is True
+        'never_auto_sync': [],
+        # if true, then indexes must have mapping files
+        'strict_validation': False
+    }
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["console"],
+            "level": env("DJANGO_LOG_LEVEL"),
+            "propagate": False,
+        },
+    },
+    "formatters": {
+        "verbose": {
+            "format": "{name} {levelname} {asctime} {module} {process:d} {thread:d} {message} {msg}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message} {msg}",
+            "style": "{",
+        },
+    },
+}
+

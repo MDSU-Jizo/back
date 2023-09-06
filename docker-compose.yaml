@@ -17,6 +17,8 @@ services:
     # Link the network to the container
     networks:
       - backend
+    # Always restart the database if it ever goes down
+    restart: always
   # The app service
   jizo:
     # Rename it jizo to avoir being named `jizo-1`
@@ -39,13 +41,91 @@ services:
     # Cannot be launched without the db service fully working
     depends_on:
       - db
+      - elastic
+      - kibana
     # Link the network to the container
+    networks:
+      - backend
+    logging:
+      driver: "json-file"
+    environment:
+      - LOGSTASH_HOST=logstash
+    restart: always
+
+  elastic:
+    environment:
+      xpack.security.enabled: false
+#      xpack.security.autoconfiguration.enabled: false
+      discovery.type: single-node
+      ES_JAVA_OPTS: -Xms1g -Xmx1g
+    image: elasticsearch:8.9.0
+    container_name: elastic
+    volumes:
+      -  elastic_data:/home/src/app/elasticsearch/data/
+    ports:
+      - "9200:9200"
+    networks:
+      - backend
+
+  logstash:
+    image: logstash:8.9.0
+    container_name: logstash
+    volumes:
+      - ./logstash/logstash.conf:/logstash_dir/logstash.conf
+    command: logstash -f /logstash_dir/logstash.conf
+    depends_on:
+      - elastic
+    ports:
+      - "5959:5959"
+    networks:
+      - backend
+
+  kibana:
+    image: kibana:8.9.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elastic
+    networks:
+      - backend
+    environment:
+      - ELASTICSEARCH_URL=http://elastic:9200
+
+  filebeat:
+    container_name: filebeat
+    image: filebeat:latest
+    user: root
+    build:
+      context: .
+      dockerfile: filebeat/Dockerfile
+      args:
+        ELASTIC_VERSION: 8.9.1
+    volumes:
+      - ./filebeat/filebeat.yaml:/usr/share/filebeat/filebeat.yaml:ro
+      - logs_volume:/home/src/app/logs
+      - type: bind
+        source: /var/lib/docker/containers
+        target: /var/lib/docker/containers
+        read_only: true
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: true
+    command: filebeat -e -c /usr/share/filebeat/filebeat.yaml -strict.perms=false
+    depends_on:
+      - jizo
+      - elastic
+      - kibana
     networks:
       - backend
 # List of named volumes
 volumes:
   pgdata:
   static_volume:
+  elastic_data:
+  logs_volume:
 # List of networks
 networks:
   backend:
+    driver: bridge
