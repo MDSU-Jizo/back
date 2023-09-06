@@ -77,7 +77,7 @@ services:
       - "9200:9200"
     # Link container to a network
     networks:
-      - ekl
+      - elk
 
   # Log collector
   logstash:
@@ -97,7 +97,7 @@ services:
       - "5959:5959"
     # Link container to a network
     networks:
-      - ekl
+      - elk
 
   # Dashboard / UI to visualize logs
   kibana:
@@ -154,7 +154,7 @@ services:
       - kibana
     # Link container to a network
     networks:
-      - ekl
+      - elk
 # List of named volumes
 # Allow to persist the volume even if the containers are down
 volumes:

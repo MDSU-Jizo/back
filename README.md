@@ -49,9 +49,11 @@ docker exec -it postgres psql -U <username> -d <database>
 ### Dev Environment
 
 Dev environment has (not for long) the `ELK` containers which allow to listen to exceptions and logs returned by the app and the containers \
-Once the dev environment started, reach for the following url: `localhost:5601` \
+Once the dev environment started, reach for the following url: `localhost:5601` 
 > [!NOTE]
-> This url will redirect you to the Kibana dashboard where you could find the logs and exceptions.
+> This url will redirect you to the Kibana dashboard where you could find the logs and exceptions. \
+> But before that it will prompt you to set the url of elastic which is `http://elastic:9200` \
+> And then ask you to get a security code you will find by opening the Kibana container logs
 
 ### Prod Environment
 > [!IMPORTANT]
