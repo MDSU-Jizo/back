@@ -5,7 +5,7 @@ services:
     # Using the postgreSQL official image
     image: postgres
     # Rename it postgres to avoid being named 'db-1'
-    container_name: postgres
+    container_name: postgres_dev
     # Define every required environment variables
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
@@ -19,10 +19,11 @@ services:
       - backend
     # Always restart the database if it ever goes down
     restart: always
+
   # The app service
   jizo:
     # Rename it jizo to avoir being named `jizo-1`
-    container_name: jizo
+    container_name: jizo_dev
     # Point to the dev.Dockerfile used for the build
     build:
       # dev.Dockerfile which is located in the same directory as the docker-compose.yaml
@@ -30,14 +31,14 @@ services:
       dockerfile: docker/dev.Dockerfile
     # Exposing ports
     ports:
-      - "9999:8000"
+      - "8008:8000"
     # Mount the volume
     volumes:
       - .:/jizo
       - static_volume:/home/src/app/web/staticfiles
     # Command used to run the server
     command:
-      python manage.py runserver 0.0.0.0:8000
+      gunicorn app.wsgi:application --bind 0.0.0.0:8000 --reload
     # Cannot be launched without the db service fully working
     depends_on:
       - db
@@ -46,6 +47,19 @@ services:
       - backend
     # Hot reload (does not work, gotta work on it)
     restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jizo.rule=Host(`jizo.dev  `)"
+
+  traefik: # new
+    image: traefik:v2.10
+    container_name: traefik_dev
+    ports:
+      - "8000:80"
+      - "8081:8080"
+    volumes:
+      - "./docker/traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
 # List of named volumes
 # Allow to persist the volume even if the containers are down
 volumes:
