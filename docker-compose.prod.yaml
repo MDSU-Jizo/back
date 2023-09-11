@@ -48,6 +48,11 @@ services:
     image: postgres
     # Rename it postgres to avoid being named 'db-1'
     container_name: postgres
+    labels: # new
+      - "traefik.enable=true"
+      - "traefik.http.routers.django.rule=Host(`traefik.jizo.app`)"
+      - "traefik.http.routers.django.tls=true"
+      - "traefik.http.routers.django.tls.certresolver=letsencrypt"
     env_file:
       - .env
     # Define every required environment variables
@@ -75,9 +80,8 @@ services:
       # prod.Dockerfile which is located in the same directory as the docker-compose.yaml
       context: .
       dockerfile: docker/prod.Dockerfile
-    # Exposing ports
-    expose:
-      - 80
+    ports:
+      - "8008:8000"
     # Mount the volume
     volumes:
       - .:/jizo
@@ -100,26 +104,26 @@ services:
     environment:
       - LOGSTASH_HOST=logstash
 
-  # The reserve proxy service
-  nginx:
-    # Rename it to nginx to avoid being name `nginx-1`
-    container_name: nginx
-    # Rename the image
-    image: jizo_nginx
-    # The folder where is located its Dockerfile
-    build: docker/nginx
-    # Mount the volume
-    volumes:
-      - static_volume:/home/src/app/web/staticfiles
-    # Port listening
+  traefik:
+    container_name: traefik
+    build:
+      context: docker/traefik/
     ports:
       - "8000:80"
-    # Depends on the jizo container to work
-    depends_on:
-      - jizo
-    # Link the network
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik-public-certificates:/certificates"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard-traefik.jizo.app`)"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD}"
     networks:
-      - backend
+      - server
 
   # data indexer
   elastic:
@@ -254,7 +258,9 @@ volumes:
   static_volume:
   elastic_data:
   logs_volume:
+  traefik-public-certificates:
 # List of networks
 networks:
   backend:
+  server:
   elk:
