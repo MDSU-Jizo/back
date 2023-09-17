@@ -1,0 +1,266 @@
+version: "3.8"
+services:
+  # The 'setup' service runs a one-off script which initializes users inside
+  # Elasticsearch — such as 'logstash_internal' and 'kibana_system' — with the
+  # values of the passwords defined in the '.env' file. It also creates the
+  # roles required by some of these users.
+  #
+  # This task only needs to be performed once, during the *initial* startup of
+  # the stack. Any subsequent run will reset the passwords of existing users to
+  # the values defined inside the '.env' file, and the built-in roles to their
+  # default permissions.
+  #
+  # By default, it is excluded from the services started by 'docker compose up'
+  # due to the non-default profile it belongs to. To run it, either provide the
+  # '--profile=setup' CLI flag to Compose commands, or "up" the service by name
+  # such as 'docker compose up setup'.
+  setup:
+    profiles:
+      - setup
+    container_name: setup
+    build:
+      context: docker/setup/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    init: true
+    volumes:
+      - ./docker/setup/entrypoint.sh:/entrypoint.sh:ro,Z
+      - ./docker/setup/lib.sh:/lib.sh:ro,Z
+      - ./docker/setup/roles:/roles:ro,Z
+    environment:
+      ELASTICSEARCH_HOST: ${ELASTICSEARCH_HOST}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      LOGSTASH_PASSWORD: ${LOGSTASH_PASSWORD:-}
+      KIBANA_PASSWORD: ${KIBANA_PASSWORD:-}
+      METRICBEAT_PASSWORD: ${METRICBEAT_PASSWORD:-}
+      FILEBEAT_PASSWORD: ${FILEBEAT_PASSWORD:-}
+      HEARTBEAT_PASSWORD: ${HEARTBEAT_PASSWORD:-}
+      MONITORING_PASSWORD: ${MONITORING_PASSWORD:-}
+      BEATS_PASSWORD: ${BEATS_PASSWORD:-}
+    networks:
+      - elk
+    depends_on:
+      - elastic
+
+  # The database service
+  db:
+    # Name the image
+    image: postgres
+    # Rename it postgres to avoid being named 'db-1'
+    container_name: postgres
+    labels: # new
+      - "traefik.enable=true"
+      - "traefik.http.routers.django.rule=Host(`traefik.jizo.app`)"
+      - "traefik.http.routers.django.tls=true"
+      - "traefik.http.routers.django.tls.certresolver=letsencrypt"
+    env_file:
+      - .env
+    # Define every required environment variables
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_HOST: "${POSTGRES_HOST}"
+      POSTGRES_PORT: "${POSTGRES_PORT}"
+    # Create a volume to persist database data
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Link the network to the container
+    networks:
+      - backend
+
+  # The app service
+  jizo:
+    # Rename it jizo to avoid being named `jizo-1`
+    container_name: jizo
+    # Rename the image
+    image: jizo_backend
+    # Point to the prod.Dockerfile used for the build
+    build:
+      # prod.Dockerfile which is located in the same directory as the docker-compose.yaml
+      context: .
+      dockerfile: docker/prod.Dockerfile
+    ports:
+      - "8008:8000"
+    # Mount the volume
+    volumes:
+      - .:/jizo
+      - static_volume:/home/app/web/staticfiles
+    # Command used to run the server
+    command:
+      gunicorn app.wsgi:application --bind 0.0.0.0:8000
+    # Cannot be launched without the db service fully working
+    depends_on:
+      - db
+      - elastic
+      - kibana
+    # Link the network to the container
+    networks:
+      - backend
+    # Set the type of logging
+    logging:
+      driver: "json-file"
+    # Declare variable that will be used in the container
+    environment:
+      - LOGSTASH_HOST=logstash
+
+  traefik:
+    container_name: traefik
+    build:
+      context: docker/traefik/
+    ports:
+      - "8000:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik-public-certificates:/certificates"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard-traefik.jizo.app`)"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD}"
+    networks:
+      - server
+
+  # data indexer
+  elastic:
+    build:
+      context: docker/elastic/
+      args:
+        ELASTIC_VERSION: "${ELASTIC_VERSION}"
+    environment:
+      node.name: elastic
+      # type of cluster
+      discovery.type: single-node
+      # Heap Size
+      # Should not be overriden as followed in production
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      # Used to initialize the keystore during the initial startup of
+      # Elasticsearch. Ignored on subsequent runs.
+      ELASTIC_PASSWORD: "${ELASTIC_PASSWORD:-}"
+    # Rename the container
+    container_name: elastic
+    # Persist data in volume
+    volumes:
+      - ./docker/elastic/elastic.yaml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - elastic_data:/home/src/app/elastic/data/:Z
+    # Bind ports
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    # Link container to a network
+    networks:
+      - elk
+    restart: unless-stopped
+
+  # Log collector
+  logstash:
+    build:
+      context: docker/logstash/
+      args:
+        ELASTIC_VERSION: "${ELASTIC_VERSION}"
+    # Rename the container
+    container_name: logstash
+    # Persist data in volume
+    volumes:
+      - ./docker/logstash/logstash.yaml:/usr/share/logstash/config/logstash.yml:ro
+      - ./docker/logstash/logstash.conf:/logstash_dir/pipeline/logstash.conf:ro,Z
+    environment:
+      LS_JAVA_OPTS: -Xms256m -Xmx256m
+      LOGSTASH_PASSWORD: "${LOGSTASH_PASSWORD:-}"
+    # Set a command for logstash to read config file
+#    command: logstash -f /logstash_dir/logstash.conf
+    # Set the dependence to elastic container
+    depends_on:
+      - elastic
+    # Bind ports
+    ports:
+      - "5044:5044"
+      - "50000:50000/tcp"
+      - "50000:50000/udp"
+      - "9600:9600"
+    # Link container to a network
+    networks:
+      - elk
+    restart: unless-stopped
+
+  # Dashboard / UI to visualize logs
+  kibana:
+    build:
+      context: docker/kibana/
+      args:
+        ELASTIC_VERSION: "${ELASTIC_VERSION}"
+    # Rename the container
+    container_name: kibana
+    # Bind ports
+    ports:
+      - "5601:5601"
+    # Set the dependence to elastic container
+    depends_on:
+      - elastic
+    # Link container to a network
+    networks:
+      - elk
+    # Declare variable that will be used in the container
+    environment:
+      KIBANA_PASSWORD: "${KIBANA_PASSWORD:-}"
+    volumes:
+      - ./docker/kibana/kibana.yaml:/usr/share/kibana/config/kibana.yml:ro
+    restart: unless-stopped
+
+
+  # Log centralizer
+  filebeat:
+    # Rename the container
+    container_name: filebeat
+    # Set a user as root since this is the role privilege needed to make it work
+    user: root
+    # The folder where is located its Dockerfile
+    build:
+      context: docker/filebeat/
+      # Send an argument its Dockerfile needs
+      args:
+        ELASTIC_VERSION: 8.9.1
+    # Persist data in volume
+    volumes:
+      # Type of bind
+      - ./docker/filebeat/filebeat.yaml:/usr/share/filebeat/filebeat.yaml:ro
+      - logs_volume:/home/src/app/logs
+      # Another way to define a bind
+      - type: bind
+        source: /var/lib/docker/containers
+        target: /var/lib/docker/containers
+        read_only: true
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: true
+    environment:
+      FILEBEAT_PASSWORD: "${FILEBEAT_PASSWORD:-}"
+    # Command that tells filebeat which file it should use as config
+    command: filebeat -e -c /usr/share/filebeat/filebeat.yaml -strict.perms=false
+    # Dependencies
+    depends_on:
+      - jizo
+      - elastic
+      - kibana
+    # Link container to a network
+    networks:
+      - elk
+    restart: unless-stopped
+# List of named volumes
+# Allow to persist the volume even if the containers are down
+volumes:
+  pgdata:
+  static_volume:
+  elastic_data:
+  logs_volume:
+  traefik-public-certificates:
+# List of networks
+networks:
+  backend:
+  server:
+  elk:
