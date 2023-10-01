@@ -52,6 +52,21 @@ INSTALLED_APPS = [
     # Third party apps
 
     # Project apps
+    "aclBundle.apps.AclbundleConfig",
+    "aclBundle_aclRoute.apps.AclbundleAclrouteConfig",
+    "aclRoute.apps.AclrouteConfig",
+    "favorite.apps.FavoriteConfig",
+    "favorite_itinerary.apps.FavoriteItineraryConfig",
+    "interest.apps.InterestConfig",
+    "itinerary.apps.ItineraryConfig",
+    "itinerary_interest.apps.ItineraryInterestConfig",
+    "itinerary_type.apps.ItineraryTypeConfig",
+    "language.apps.LanguageConfig",
+    "level.apps.LevelConfig",
+    "role.apps.RoleConfig",
+    "role_aclBundle.apps.RoleAclbundleConfig",
+    "type.apps.TypeConfig",
+    "user.apps.UserConfig",
 ]
 
 MIDDLEWARE = [
@@ -94,7 +109,7 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': env('POSTGRES_DB'),
         'USER': env('POSTGRES_USER'),
         'PASSWORD': env('POSTGRES_PASSWORD'),
@@ -203,3 +218,18 @@ LOGGING = {
         },
     },
 }
+
+# CONSTANTS
+
+ROLES = {
+    'ROLE_USER': 1,
+    'ROLE_PREMIUM': 2,
+    'ROLE_ADMIN': 3,
+    'ROLE_SUPER_ADMIN': 4,
+}
+
+GENDER_CHOICES = [
+    (1, "Male"),
+    (2, "Female"),
+    (3, "Other"),
+]
