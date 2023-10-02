@@ -1,5 +1,8 @@
-import jwt
+"""
+    Middleware to verify JWT authorization
+"""
 import logging
+import jwt
 from django.conf import settings
 from environ import Env
 from service.api_response import send_json_response as api_response
