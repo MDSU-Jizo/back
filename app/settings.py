@@ -81,6 +81,10 @@ MIDDLEWARE = [
 
     # Third party Middlewares
     'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    # Project Middlewares
+    'middleware.jwt_verification.JwtVerificationMiddleware',
+    'middleware.exception_handler.ExceptionHandlerMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'
@@ -233,3 +237,14 @@ GENDER_CHOICES = [
     (2, "Female"),
     (3, "Other"),
 ]
+
+HTTP_CONSTANTS = {
+    'SUCCESS': 200,
+    'CREATED': 201,
+    'BAD_REQUEST': 400,
+    'UNAUTHENTICATED': 401,
+    'FORBIDDEN': 403,
+    'NOT_FOUND': 404,
+    'NOT_ALLOWED': 405,
+    'INTERNAL_SERVER_ERROR': 500,
+}
