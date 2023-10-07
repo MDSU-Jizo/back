@@ -12,6 +12,7 @@ then
 fi
 
 python manage.py flush --no-input
+echo "[1/2] Running migrations.."
 python manage.py migrate
-
-exec "$@"
+echo "[2/2] Starting server in development..."
+python manage.py runserver 0.0.0.0:8000

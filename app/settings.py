@@ -83,8 +83,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
     # Project Middlewares
-    'middleware.jwt_verification.JwtVerificationMiddleware',
-    'middleware.exception_handler.ExceptionHandlerMiddleware',
+    # 'middleware.jwt_verification.JwtVerificationMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'
@@ -223,28 +222,4 @@ LOGGING = {
     },
 }
 
-# CONSTANTS
-
-ROLES = {
-    'ROLE_USER': 1,
-    'ROLE_PREMIUM': 2,
-    'ROLE_ADMIN': 3,
-    'ROLE_SUPER_ADMIN': 4,
-}
-
-GENDER_CHOICES = [
-    (1, "Male"),
-    (2, "Female"),
-    (3, "Other"),
-]
-
-HTTP_CONSTANTS = {
-    'SUCCESS': 200,
-    'CREATED': 201,
-    'BAD_REQUEST': 400,
-    'UNAUTHENTICATED': 401,
-    'FORBIDDEN': 403,
-    'NOT_FOUND': 404,
-    'NOT_ALLOWED': 405,
-    'INTERNAL_SERVER_ERROR': 500,
-}
+WEBHOOK_URL = env('WEBHOOK_URL')

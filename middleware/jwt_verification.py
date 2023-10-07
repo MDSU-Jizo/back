@@ -1,9 +1,11 @@
 """
     Middleware to verify JWT authorization
 """
+import dataclasses
 import logging
 import jwt
-from django.conf import settings
+
+from contract.constants import Constants
 from environ import Env
 from service.api_response import send_json_response as api_response
 
@@ -12,13 +14,15 @@ logger = logging.getLogger(__name__)
 env = Env()
 env.read_env()
 SECRET_KEY = env("JWT_SECRET_KEY")
-unauthenticated = settings.HTTP_CONSTANTS['UNAUTHENTICATED']
+unauthenticated = Constants.HttpResponseCodes.UNAUTHENTICATED
 
 
+@dataclasses.dataclass
 class JwtVerificationMiddleware:
     """
         JWT Verification Middleware Class to process a request before it reached the endpoint
     """
+    @dataclasses.dataclass
     def process_request(self, request):
         """
             Middleware handler to check JWT authentication

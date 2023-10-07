@@ -36,11 +36,8 @@ services:
       - "8008:8000"
     # Mount the volume
     volumes:
-      - .:/jizo
+      - .:/usr/src
       - static_volume:/home/src/app/web/staticfiles
-    # Command used to run the server
-    command:
-      gunicorn app.wsgi:application --bind 0.0.0.0:8000 --reload
     # Cannot be launched without the db service fully working
     depends_on:
       - db
@@ -52,6 +49,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jizo.rule=Host(`jizo.dev`)"
+    tty: true
 
   traefik: # new
     image: traefik:v2.10
