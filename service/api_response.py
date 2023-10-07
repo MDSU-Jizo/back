@@ -28,7 +28,7 @@ def send_json_response(code=http_codes.SUCCESS, result='success', message='', da
     """
 
     if data is None:
-        data = {}
+        data = []
 
     if code.value >= 400:
         logger.error("Received error %s with the following message: %s", code.value, message)

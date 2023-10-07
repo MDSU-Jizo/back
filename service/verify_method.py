@@ -22,7 +22,7 @@ def verify_method(expected_method, requested_method, requested_path):
         return api_response(
             code=Constants.HttpResponseCodes.BAD_REQUEST,
             result='error',
-            message=f'Must be a ${expected_method} method.',
+            message=f'Must be a {expected_method} method.',
             url=requested_path
         )
 

@@ -16,4 +16,4 @@ class Level(models.Model):
         db_table = 'level'
 
     def __str__(self):
-        return f'id: {self.pk}, label: {self.label}'
+        return f'id: {self.pk}, label: {self.label}, isActivate: {self.is_activate}'

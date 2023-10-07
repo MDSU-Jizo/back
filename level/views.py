@@ -59,6 +59,14 @@ def get_level(request, level_id):
 
 @csrf_exempt
 def add_level(request):
+    """
+        Function to add a level in database
+
+        Args:
+            request: Request header containing authorization and method
+        Returns:
+            JsonResponse containing request's information
+    """
     verify_method(expected_method='POST', requested_method=request.method, requested_path=request.path)
 
     content = json.loads(request.body.decode('utf-8'))
@@ -78,6 +86,14 @@ def add_level(request):
 
 @csrf_exempt
 def update_level(request):
+    """
+        Function to update a level in database
+
+        Args:
+            request: Request header containing authorization and method
+        Returns:
+            JsonResponse containing request's information
+    """
     verify_method(expected_method='PATCH', requested_method=request.method, requested_path=request.path)
 
     content = json.loads(request.body.decode('utf-8'))
@@ -85,9 +101,21 @@ def update_level(request):
     try:
         level = Level.objects.get(pk=content['id'])
         if not level:
-            return api_response(code=http_codes.NOT_FOUND, result='error', message='Level not found.', url=request.path)
+            return api_response(
+                code=http_codes.NOT_FOUND,
+                result='error',
+                message='Level not found.',
+                url=request.path,
+                payload=content
+            )
     except Level.DoesNotExist:
-        return api_response(code=http_codes.NOT_FOUND, result='error', message='Level not found.', url=request.path)
+        return api_response(
+            code=http_codes.NOT_FOUND,
+            result='error',
+            message='Level not found.',
+            url=request.path,
+            payload=content
+        )
 
     form = LevelForm(instance=level, data=content)
     if not form.is_valid():
@@ -106,6 +134,15 @@ def update_level(request):
 
 @csrf_exempt
 def delete_level(request, level_id):
+    """
+        Function to set is_active to False on a level in database
+
+        Args:
+            request: Request header containing authorization and method
+            level_id: id of the level
+        Returns:
+            JsonResponse containing request's information
+    """
     verify_method(expected_method='DELETE', requested_method=request.method, requested_path=request.path)
 
     try:

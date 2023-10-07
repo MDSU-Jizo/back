@@ -6,7 +6,7 @@ def levels_normalizer(levels):
         Function to return levels as formatted data
 
         Args:
-            levels: list of levels
+            levels (list): list of levels
         Returns:
             result: levels as a list of dict
     """
@@ -26,6 +26,14 @@ def levels_normalizer(levels):
 
 
 def level_normalizer(level):
+    """
+        Function to return levels as formatted data
+
+        Args:
+            level (object):
+        Returns:
+            result: level as dict
+    """
     return {
         'id': level.id,
         'label': level.label
