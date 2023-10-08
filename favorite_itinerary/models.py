@@ -5,8 +5,8 @@ from django.db import models
 
 class FavoriteItinerary(models.Model):
     """Class representing the FavoriteItinerary M2M entity"""
-    favoriteId = models.ForeignKey('favorite.Favorite', on_delete=models.CASCADE, null=False)
-    itineraryId = models.ForeignKey('itinerary.Itinerary', on_delete=models.CASCADE, null=False)
+    favorite_id = models.ForeignKey('favorite.Favorite', on_delete=models.CASCADE, null=False)
+    itinerary_id = models.ForeignKey('itinerary.Itinerary', on_delete=models.CASCADE, null=False)
 
     @dataclasses.dataclass
     class Meta:

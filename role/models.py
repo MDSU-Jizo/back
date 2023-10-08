@@ -6,7 +6,7 @@ from django.db import models
 class Role(models.Model):
     """Class representing the Role entity"""
     label = models.CharField(max_length=100, null=False)
-    isActivate = models.BooleanField(default=True, null=True, blank=True)
+    is_activate = models.BooleanField(default=True, null=True, blank=True)
 
     @dataclasses.dataclass
     class Meta:

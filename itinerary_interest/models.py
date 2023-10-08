@@ -5,8 +5,8 @@ from django.db import models
 
 class ItineraryInterest(models.Model):
     """Class representing the ItineraryInterest M2M entity"""
-    itineraryId = models.ForeignKey('itinerary.Itinerary', on_delete=models.CASCADE, null=False)
-    interestId = models.ForeignKey('interest.Interest', on_delete=models.CASCADE, null=False)
+    itinerary_id = models.ForeignKey('itinerary.Itinerary', on_delete=models.CASCADE, null=False)
+    interest_id = models.ForeignKey('interest.Interest', on_delete=models.CASCADE, null=False)
 
     @dataclasses.dataclass
     class Meta:

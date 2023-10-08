@@ -6,7 +6,7 @@ from django.db import models
 class Favorite(models.Model):
     """Class representing the Favorite entity"""
     user_id = models.ForeignKey('user.User', on_delete=models.CASCADE, null=False)
-    isActive = models.BooleanField(default=True, null=True, blank=True)
+    is_activate = models.BooleanField(default=True, null=True, blank=True)
 
     @dataclasses.dataclass
     class Meta:

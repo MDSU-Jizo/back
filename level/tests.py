@@ -1,5 +1,6 @@
-import json
-
+"""
+    Type Unit Tests
+"""
 from django.test import TestCase, RequestFactory
 from .models import Level
 from .views import get_levels, get_level, add_level, update_level, delete_level
@@ -118,7 +119,7 @@ class LevelTestCase(TestCase):
         """
             Unit test on get_levels route with filter set to False while the database has no entity set to False
         """
-        request = self.factory.get("/level/?filter=False")
+        request = self.factory.get("/level/?isActivate=False")
         response = get_levels(request)
 
         self.assertEqual(response.status_code, 200)
@@ -171,7 +172,7 @@ class LevelTestCase(TestCase):
             Unit test on get_levels route with filter set to False
         """
         Level.objects.update(id=2, label="UnitTestLevel", is_activate=False)
-        request = self.factory.get("/level/?filter=False")
+        request = self.factory.get("/level/?isActivate=False")
         response = get_levels(request)
 
         self.assertEqual(response.status_code, 200)

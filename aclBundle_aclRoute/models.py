@@ -5,8 +5,8 @@ from django.db import models
 
 class AclBundleAclRoute(models.Model):
     """Class representing the AclBundleAclRoute M2M entity"""
-    aclBundleId = models.ForeignKey('aclBundle.AclBundle', on_delete=models.CASCADE, null=False)
-    aclRouteId = models.ForeignKey('aclRoute.AclRoute', on_delete=models.CASCADE, null=False)
+    acl_bundle_id = models.ForeignKey('aclBundle.AclBundle', on_delete=models.CASCADE, null=False)
+    acl_route_id = models.ForeignKey('aclRoute.AclRoute', on_delete=models.CASCADE, null=False)
 
     @dataclasses.dataclass
     class Meta:

@@ -6,7 +6,7 @@ from django.db import models
 class Language(models.Model):
     """Class representing the Language entity"""
     label = models.CharField(max_length=255, null=False)
-    isActive = models.BooleanField(default=True, null=True, blank=True)
+    is_activate = models.BooleanField(default=True, null=True, blank=True)
 
     @dataclasses.dataclass
     class Meta:

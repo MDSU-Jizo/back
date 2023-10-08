@@ -13,10 +13,10 @@ class User(models.Model):
     birthdate = models.DateField(null=False)
     gender = models.CharField(max_length=10, choices=Constants.GENDER_CHOICES, default=1, null=False)
     country = models.CharField(max_length=255, null=False)
-    createdAt = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    updatedAt = models.DateTimeField(auto_now=True, null=True, blank=True)
-    languageId = models.ForeignKey('language.Language', on_delete=models.CASCADE, default=1)
-    roleId = models.ForeignKey(
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    language_id = models.ForeignKey('language.Language', on_delete=models.CASCADE, default=1)
+    role_id = models.ForeignKey(
         'role.Role',
         on_delete=models.CASCADE,
         default=Constants.Roles.ROLE_USER

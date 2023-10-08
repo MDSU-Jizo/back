@@ -1,4 +1,6 @@
-from .models import Level
+"""
+    Level normalizers
+"""
 
 
 def levels_normalizer(levels):
@@ -13,7 +15,6 @@ def levels_normalizer(levels):
     result = []
 
     for level in levels:
-        print(level)
         item = {
             'id': level['id'],
             'label': level['label'],
@@ -27,7 +28,7 @@ def levels_normalizer(levels):
 
 def level_normalizer(level):
     """
-        Function to return levels as formatted data
+        Function to return level as formatted data
 
         Args:
             level (object):
