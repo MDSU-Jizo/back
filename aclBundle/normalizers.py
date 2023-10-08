@@ -1,5 +1,5 @@
 """
-    Role normalizers
+    AclBundle normalizers
 """
 
 

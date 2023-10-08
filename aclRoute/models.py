@@ -12,3 +12,6 @@ class AclRoute(models.Model):
     class Meta:
         """Define the name of the table"""
         db_table = 'aclroute'
+
+    def __str__(self):
+        return f'id: {self.pk}, label: {self.label}, isActivate: ${self.is_activate}'
