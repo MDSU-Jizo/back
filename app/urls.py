@@ -22,4 +22,5 @@ urlpatterns = [
     path('level/', include('level.urls')),
     path('type/', include('type.urls')),
     path('role/', include('role.urls')),
+    path('acl-bundle/', include('aclBundle.urls')),
 ]

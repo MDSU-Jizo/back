@@ -12,3 +12,6 @@ class AclBundle(models.Model):
     class Meta:
         """Define the name of the table"""
         db_table = 'aclbundle'
+
+    def __str__(self):
+        return f'id: {self.pk}, label: {self.label}, isActivate: ${self.is_activate}'
