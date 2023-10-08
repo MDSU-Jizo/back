@@ -24,4 +24,5 @@ urlpatterns = [
     path('role/', include('role.urls')),
     path('acl-bundle/', include('aclBundle.urls')),
     path('acl-route/', include('aclRoute.urls')),
+    path('interest/', include('interest.urls')),
 ]
