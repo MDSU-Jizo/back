@@ -104,6 +104,30 @@ class LevelTestCase(TestCase):
             "id": 666,
             "label": "UnitTestUpdateLevel"
         }
+        self.level_bad_method_on_get_response = {
+            "code": 400,
+            "result": "error",
+            "message": "Must be a GET method.",
+            "data": []
+        }
+        self.level_bad_method_on_post_response = {
+            "code": 400,
+            "result": "error",
+            "message": "Must be a POST method.",
+            "data": []
+        }
+        self.level_bad_method_on_patch_response = {
+            "code": 400,
+            "result": "error",
+            "message": "Must be a PATCH method.",
+            "data": []
+        }
+        self.level_bad_method_on_delete_response = {
+            "code": 400,
+            "result": "error",
+            "message": "Must be a DELETE method.",
+            "data": []
+        }
 
     def test_get_activated_levels(self):
         """
@@ -223,3 +247,50 @@ class LevelTestCase(TestCase):
         response = update_level(request)
 
         self.assertJSONEqual(response.content, self.level_not_found_response)
+
+    def test_get_levels_with_bad_method(self):
+        """
+            Unit test on get_levels route with bad request method
+        """
+        request = self.factory.post("/level/")
+        response = get_levels(request)
+
+        self.assertJSONEqual(response.content, self.level_bad_method_on_get_response)
+
+    def test_get_level_with_bad_method(self):
+        """
+            Unit test on get_level route with bad request method
+        """
+        id = 2
+        request = self.factory.post(f"/level/details/{id}")
+        response = get_level(request, id)
+
+        self.assertJSONEqual(response.content, self.level_bad_method_on_get_response)
+
+    def test_add_level_with_bad_method(self):
+        """
+            Unit test on add_level route with bad request method
+        """
+        request = self.factory.patch("/level/add", self.level_add_payload, content_type='application/json')
+        response = add_level(request)
+
+        self.assertJSONEqual(response.content, self.level_bad_method_on_post_response)
+
+    def test_update_level_with_bad_method(self):
+        """
+            Unit test on update_level route with bad request method
+        """
+        request = self.factory.post("/level/update", self.level_update_payload, content_type='application/json')
+        response = update_level(request)
+
+        self.assertJSONEqual(response.content, self.level_bad_method_on_patch_response)
+
+    def test_delete_level_with_bad_method(self):
+        """
+            Unit test on delete_level route with bad request method
+        """
+        id = 2
+        request = self.factory.get(f"/level/delete/{id}")
+        response = delete_level(request, id)
+
+        self.assertJSONEqual(response.content, self.level_bad_method_on_delete_response)

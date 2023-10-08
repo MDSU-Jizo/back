@@ -3,6 +3,7 @@
 """
 import json
 
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .models import Level
 from .normalizers import levels_normalizer, level_normalizer
@@ -14,6 +15,7 @@ from contract.constants import Constants
 HttpCode = Constants.HttpResponseCodes
 
 
+@csrf_exempt
 def get_levels(request):
     """
         Function to fetch every level from database
@@ -25,7 +27,9 @@ def get_levels(request):
         Filter:
             isActivate (False, optional with default value to True): Fetched from request url parameter.
     """
-    verify_method('GET', request.method, requested_path=request.path)
+    has_method = verify_method(expected_method='GET', requested_method=request.method, requested_path=request.path)
+    if isinstance(has_method, JsonResponse):
+        return has_method
 
     filter = request.GET.get('isActivate', True)
     try:
@@ -37,6 +41,7 @@ def get_levels(request):
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
 
 
+@csrf_exempt
 def get_level(request, level_id):
     """
         Function to fetch every level from database
@@ -47,7 +52,9 @@ def get_level(request, level_id):
         Returns:
             JsonResponse containing request's information
     """
-    verify_method(expected_method='GET', requested_method=request.method, requested_path=request.path)
+    has_method = verify_method(expected_method='GET', requested_method=request.method, requested_path=request.path)
+    if isinstance(has_method, JsonResponse):
+        return has_method
 
     try:
         level = Level.objects.get(pk=level_id)
@@ -60,6 +67,7 @@ def get_level(request, level_id):
     normalizer = level_normalizer(level)
     return api_response(code=HttpCode.SUCCESS, result='success', data=normalizer)
 
+
 @csrf_exempt
 def add_level(request):
     """
@@ -70,7 +78,9 @@ def add_level(request):
         Returns:
             JsonResponse containing request's information
     """
-    verify_method(expected_method='POST', requested_method=request.method, requested_path=request.path)
+    has_method = verify_method(expected_method='POST', requested_method=request.method, requested_path=request.path)
+    if isinstance(has_method, JsonResponse):
+        return has_method
 
     content = json.loads(request.body.decode('utf-8'))
     form = LevelForm(content)
@@ -87,6 +97,7 @@ def add_level(request):
     form.save()
     return api_response(code=HttpCode.CREATED, result='success', message='Level created successfully.')
 
+
 @csrf_exempt
 def update_level(request):
     """
@@ -97,7 +108,9 @@ def update_level(request):
         Returns:
             JsonResponse containing request's information
     """
-    verify_method(expected_method='PATCH', requested_method=request.method, requested_path=request.path)
+    has_method = verify_method(expected_method='PATCH', requested_method=request.method, requested_path=request.path)
+    if isinstance(has_method, JsonResponse):
+        return has_method
 
     content = json.loads(request.body.decode('utf-8'))
 
@@ -146,7 +159,9 @@ def delete_level(request, level_id):
         Returns:
             JsonResponse containing request's information
     """
-    verify_method(expected_method='DELETE', requested_method=request.method, requested_path=request.path)
+    has_method = verify_method(expected_method='DELETE', requested_method=request.method, requested_path=request.path)
+    if isinstance(has_method, JsonResponse):
+        return has_method
 
     try:
         level = Level.objects.get(pk=level_id)

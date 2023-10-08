@@ -18,6 +18,7 @@ disc_webhook = DiscordWebhook(
     allowed_mentions=allowed_mentions
 )
 
+
 class Webhook:
     """
         Webhook class
@@ -57,4 +58,4 @@ class Webhook:
 
         embed.set_thumbnail(url=ICON)
         disc_webhook.add_embed(embed)
-        disc_webhook.execute()
+        disc_webhook.execute(remove_embeds=True)

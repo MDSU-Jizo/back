@@ -3,6 +3,7 @@
 """
 import json
 
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .models import Type
 from .normalizers import types_normalizer, type_normalizer
@@ -25,7 +26,9 @@ def get_types(request):
         Filter:
             isActivate (False, optional with default value to True): Fetched from request url parameter.
     """
-    verify_method('GET', request.method, requested_path=request.path)
+    has_method = verify_method(expected_method='GET', requested_method=request.method, requested_path=request.path)
+    if isinstance(has_method, JsonResponse):
+        return has_method
 
     filter = request.GET.get('isActivate', True)
     try:
@@ -47,7 +50,9 @@ def get_type(request, type_id):
         Returns:
             JsonResponse containing request's information
     """
-    verify_method(expected_method='GET', requested_method=request.method, requested_path=request.path)
+    has_method = verify_method(expected_method='GET', requested_method=request.method, requested_path=request.path)
+    if isinstance(has_method, JsonResponse):
+        return has_method
 
     try:
         type = Type.objects.get(pk=type_id)
@@ -70,7 +75,9 @@ def add_type(request):
         Returns:
             JsonResponse containing request's information
     """
-    verify_method(expected_method='POST', requested_method=request.method, requested_path=request.path)
+    has_method = verify_method(expected_method='POST', requested_method=request.method, requested_path=request.path)
+    if isinstance(has_method, JsonResponse):
+        return has_method
 
     content = json.loads(request.body.decode('utf-8'))
     form = TypeForm(content)
@@ -97,7 +104,9 @@ def update_type(request):
         Returns:
             JsonResponse containing request's information
     """
-    verify_method(expected_method='PATCH', requested_method=request.method, requested_path=request.path)
+    has_method = verify_method(expected_method='PATCH', requested_method=request.method, requested_path=request.path)
+    if isinstance(has_method, JsonResponse):
+        return has_method
 
     content = json.loads(request.body.decode('utf-8'))
 
@@ -146,7 +155,9 @@ def delete_type(request, type_id):
         Returns:
             JsonResponse containing request's information
     """
-    verify_method(expected_method='DELETE', requested_method=request.method, requested_path=request.path)
+    has_method = verify_method(expected_method='DELETE', requested_method=request.method, requested_path=request.path)
+    if isinstance(has_method, JsonResponse):
+        return has_method
 
     try:
         type = Type.objects.get(pk=type_id)

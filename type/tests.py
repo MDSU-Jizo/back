@@ -105,6 +105,30 @@ class TypeTestCase(TestCase):
             "id": 666,
             "label": "UnitTestUpdateType"
         }
+        self.type_bad_method_on_get_response = {
+            "code": 400,
+            "result": "error",
+            "message": "Must be a GET method.",
+            "data": []
+        }
+        self.type_bad_method_on_post_response = {
+            "code": 400,
+            "result": "error",
+            "message": "Must be a POST method.",
+            "data": []
+        }
+        self.type_bad_method_on_patch_response = {
+            "code": 400,
+            "result": "error",
+            "message": "Must be a PATCH method.",
+            "data": []
+        }
+        self.type_bad_method_on_delete_response = {
+            "code": 400,
+            "result": "error",
+            "message": "Must be a DELETE method.",
+            "data": []
+        }
 
     def test_get_activated_types(self):
         """
@@ -224,3 +248,50 @@ class TypeTestCase(TestCase):
         response = update_type(request)
 
         self.assertJSONEqual(response.content, self.type_not_found_response)
+
+    def test_get_types_with_bad_method(self):
+        """
+            Unit test on get_types route with bad request method
+        """
+        request = self.factory.post("/type/")
+        response = get_types(request)
+
+        self.assertJSONEqual(response.content, self.type_bad_method_on_get_response)
+
+    def test_get_type_with_bad_method(self):
+        """
+            Unit test on get_type route with bad request method
+        """
+        id = 2
+        request = self.factory.post(f"/type/details/{id}")
+        response = get_type(request, id)
+
+        self.assertJSONEqual(response.content, self.type_bad_method_on_get_response)
+
+    def test_add_type_with_bad_method(self):
+        """
+            Unit test on add_type route with bad request method
+        """
+        request = self.factory.patch("/type/add", self.type_add_payload, content_type='application/json')
+        response = add_type(request)
+
+        self.assertJSONEqual(response.content, self.type_bad_method_on_post_response)
+
+    def test_update_type_with_bad_method(self):
+        """
+            Unit test on update_type route with bad request method
+        """
+        request = self.factory.post("/type/update", self.type_update_payload, content_type='application/json')
+        response = update_type(request)
+
+        self.assertJSONEqual(response.content, self.type_bad_method_on_patch_response)
+
+    def test_delete_type_with_bad_method(self):
+        """
+            Unit test on delete_type route with bad request method
+        """
+        id = 2
+        request = self.factory.get(f"/type/delete/{id}")
+        response = delete_type(request, id)
+
+        self.assertJSONEqual(response.content, self.type_bad_method_on_delete_response)
