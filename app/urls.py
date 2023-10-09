@@ -25,4 +25,5 @@ urlpatterns = [
     path('acl-bundle/', include('aclBundle.urls')),
     path('acl-route/', include('aclRoute.urls')),
     path('interest/', include('interest.urls')),
+    path('language/', include('language.urls')),
 ]
