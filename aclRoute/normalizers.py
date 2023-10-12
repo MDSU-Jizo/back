@@ -16,9 +16,10 @@ def acl_routes_normalizer(acl_routes):
 
     for acl_route in acl_routes:
         item = {
-            'id': acl_route['id'],
-            'label': acl_route['label'],
-            'isActivate': acl_route['is_activate'],
+            'id': acl_route.id,
+            'label': acl_route.label,
+            'bundles': acl_route.bundles,
+            'isActivate': acl_route.is_activate,
         }
 
         result.append(item)
@@ -31,11 +32,14 @@ def acl_route_normalizer(acl_route):
         Function to return acl_route as formatted data
 
         Args:
-            acl_route (object):
+            acl_route (list):
         Returns:
             result: acl_route as dict
     """
-    return {
-        'id': acl_route.id,
-        'label': acl_route.label
-    }
+    for route in acl_route:
+        return {
+            'id': route.id,
+            'label': route.label,
+            'bundles': route.bundles,
+            'isActivate': route.is_activate,
+        }

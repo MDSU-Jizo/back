@@ -5,7 +5,7 @@ import json
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from .models import AclRoute
+from .models import AclRoute, get_acl_routes_with_bundles, get_acl_route_with_bundles
 from .normalizers import acl_routes_normalizer, acl_route_normalizer
 from .forms import AclRouteForm
 from service.api_response import send_json_response as api_response
@@ -33,7 +33,7 @@ def get_acl_routes(request):
 
     filter = request.GET.get('isActivate', True)
     try:
-        acl_routes = AclRoute.objects.all().values().filter(is_activate=filter)
+        acl_routes = get_acl_routes_with_bundles(filter)
     except AclRoute.DoesNotExist:
         return api_response(HttpCode.SUCCESS, 'success', data=[])
 
@@ -57,7 +57,7 @@ def get_acl_route(request, acl_route_id):
         return has_method
 
     try:
-        acl_route = AclRoute.objects.get(pk=acl_route_id)
+        acl_route = get_acl_route_with_bundles(acl_route_id)
 
         if not acl_route:
             return api_response(code=HttpCode.NOT_FOUND, result='error', message='AclRoute not found.', url=request.path)

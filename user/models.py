@@ -15,8 +15,8 @@ class User(models.Model):
     country = models.CharField(max_length=255, null=False)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
-    language_id = models.ForeignKey('language.Language', on_delete=models.CASCADE, default=1)
-    role_id = models.ForeignKey(
+    language = models.ForeignKey('language.Language', on_delete=models.CASCADE, default=1)
+    role = models.ForeignKey(
         'role.Role',
         on_delete=models.CASCADE,
         default=Constants.Roles.ROLE_USER

@@ -5,8 +5,8 @@ from django.db import models
 
 class RoleAclBundle(models.Model):
     """Class representing the RoleAclBundle M2M entity"""
-    role_id = models.ForeignKey('role.Role', on_delete=models.CASCADE, null=False)
-    acl_bundle_id = models.ForeignKey('aclBundle.AclBundle', on_delete=models.CASCADE, null=False)
+    role = models.ForeignKey('role.Role', on_delete=models.CASCADE, null=False)
+    acl_bundle = models.ForeignKey('aclBundle.AclBundle', on_delete=models.CASCADE, null=False)
 
     @dataclasses.dataclass
     class Meta:

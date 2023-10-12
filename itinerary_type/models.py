@@ -5,8 +5,8 @@ from django.db import models
 
 class ItineraryType(models.Model):
     """Class representing the ItineraryType M2M entity"""
-    itinerary_id = models.ForeignKey('itinerary.Itinerary', on_delete=models.CASCADE, null=False)
-    type_id = models.ForeignKey('type.Type', on_delete=models.CASCADE, null=False)
+    itinerary = models.ForeignKey('itinerary.Itinerary', on_delete=models.CASCADE, null=False)
+    type = models.ForeignKey('type.Type', on_delete=models.CASCADE, null=False)
 
     @dataclasses.dataclass
     class Meta:

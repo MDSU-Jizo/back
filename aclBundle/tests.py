@@ -3,6 +3,8 @@
 """
 from django.test import TestCase, RequestFactory
 from .models import AclBundle
+from aclRoute.models import AclRoute
+from aclBundle_aclRoute.models import AclBundleAclRoute
 from .views import get_acl_bundles, get_acl_bundle, add_acl_bundle, update_acl_bundle, delete_acl_bundle
 
 
@@ -13,6 +15,8 @@ class AclBundleTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.acl_bundle = AclBundle.objects.create(id=2, label="UnitTestAclBundle")
+        self.acl_route = AclRoute.objects.create(id=1, label="UnitTestAclRoute")
+        self.bundle_route = AclBundleAclRoute.objects.create(id=1, acl_bundle_id=2, acl_route_id=1)
         self.activated_acl_bundles_response = {
             "code": 200,
             "result": "success",
@@ -21,6 +25,9 @@ class AclBundleTestCase(TestCase):
                 {
                     "id": 2,
                     "label": "UnitTestAclBundle",
+                    "routes": [
+                        "UnitTestAclRoute"
+                    ],
                     "isActivate": True
                 }
             ]
@@ -39,6 +46,9 @@ class AclBundleTestCase(TestCase):
                 {
                     "id": 2,
                     "label": "UnitTestAclBundle",
+                    "routes": [
+                        "UnitTestAclRoute"
+                    ],
                     "isActivate": False
                 }
             ]
@@ -49,7 +59,11 @@ class AclBundleTestCase(TestCase):
             "message": "",
             "data": {
                 "id": 2,
-                "label": "UnitTestAclBundle"
+                "label": "UnitTestAclBundle",
+                "routes": [
+                    "UnitTestAclRoute"
+                ],
+                "isActivate": True
             }
         }
         self.acl_bundle_not_found_response = {

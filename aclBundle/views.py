@@ -5,7 +5,7 @@ import json
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from .models import AclBundle
+from .models import AclBundle, get_acl_bundles_with_routes, get_acl_bundle_with_routes
 from .normalizers import acl_bundles_normalizer, acl_bundle_normalizer
 from .forms import AclBundleForm
 from service.api_response import send_json_response as api_response
@@ -33,7 +33,7 @@ def get_acl_bundles(request):
 
     filter = request.GET.get('isActivate', True)
     try:
-        acl_bundles = AclBundle.objects.all().values().filter(is_activate=filter)
+        acl_bundles = get_acl_bundles_with_routes(filter)
     except AclBundle.DoesNotExist:
         return api_response(HttpCode.SUCCESS, 'success', data=[])
 
@@ -57,7 +57,7 @@ def get_acl_bundle(request, acl_bundle_id):
         return has_method
 
     try:
-        acl_bundle = AclBundle.objects.get(pk=acl_bundle_id)
+        acl_bundle = get_acl_bundle_with_routes(acl_bundle_id)
 
         if not acl_bundle:
             return api_response(code=HttpCode.NOT_FOUND, result='error', message='AclBundle not found.', url=request.path)

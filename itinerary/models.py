@@ -13,8 +13,8 @@ class Itinerary(models.Model):
     steps = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
-    level_id = models.ForeignKey('level.Level', on_delete=models.CASCADE, null=False)
-    user_id = models.ForeignKey('user.User', on_delete=models.CASCADE, null=False)
+    level = models.ForeignKey('level.Level', on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE, null=False)
 
     @dataclasses.dataclass
     class Meta:

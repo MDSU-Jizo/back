@@ -16,9 +16,10 @@ def acl_bundles_normalizer(acl_bundles):
 
     for acl_bundle in acl_bundles:
         item = {
-            'id': acl_bundle['id'],
-            'label': acl_bundle['label'],
-            'isActivate': acl_bundle['is_activate'],
+            'id': acl_bundle.id,
+            'label': acl_bundle.label,
+            'routes': acl_bundle.routes,
+            'isActivate': acl_bundle.is_activate,
         }
 
         result.append(item)
@@ -31,11 +32,14 @@ def acl_bundle_normalizer(acl_bundle):
         Function to return acl_bundle as formatted data
 
         Args:
-            acl_bundle (object):
+            acl_bundle (list):
         Returns:
             result: acl_bundle as dict
     """
-    return {
-        'id': acl_bundle.id,
-        'label': acl_bundle.label
-    }
+    for bundle in acl_bundle:
+        return {
+            'id': bundle.id,
+            'label': bundle.label,
+            'routes': bundle.routes,
+            'isActivate': bundle.is_activate,
+        }
