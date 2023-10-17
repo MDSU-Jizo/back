@@ -34,7 +34,7 @@ def get_types(request):
     try:
         types = Type.objects.all().values().filter(is_activate=filter)
     except Type.DoesNotExist:
-        return api_response(HttpCode.SUCCESS, 'success', data=[])
+        return api_response(HttpCode.SUCCESS, 'success')
 
     normalizer = types_normalizer(types)
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)

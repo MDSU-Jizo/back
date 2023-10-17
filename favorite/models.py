@@ -12,3 +12,6 @@ class Favorite(models.Model):
     class Meta:
         """Define the name of the table"""
         db_table = 'favorite'
+
+    def __str__(self):
+        return f'User id: {self.user}, isActivate: {self.is_activate}'

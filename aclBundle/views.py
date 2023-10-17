@@ -16,7 +16,7 @@ HttpCode = Constants.HttpResponseCodes
 
 
 @csrf_exempt
-def get_acl_bundles(request):
+def get_acl_bundles(request) -> JsonResponse:
     """
         Function to fetch every acl_bundle from database
 
@@ -35,14 +35,14 @@ def get_acl_bundles(request):
     try:
         acl_bundles = get_acl_bundles_with_routes(filter)
     except AclBundle.DoesNotExist:
-        return api_response(HttpCode.SUCCESS, 'success', data=[])
+        return api_response(HttpCode.SUCCESS, 'success')
 
     normalizer = acl_bundles_normalizer(acl_bundles)
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
 
 
 @csrf_exempt
-def get_acl_bundle(request, acl_bundle_id):
+def get_acl_bundle(request, acl_bundle_id) -> JsonResponse:
     """
         Function to fetch every acl_bundle from database
 
@@ -69,7 +69,7 @@ def get_acl_bundle(request, acl_bundle_id):
 
 
 @csrf_exempt
-def add_acl_bundle(request):
+def add_acl_bundle(request) -> JsonResponse:
     """
         Function to add a acl_bundle in database
 
@@ -99,7 +99,7 @@ def add_acl_bundle(request):
 
 
 @csrf_exempt
-def update_acl_bundle(request):
+def update_acl_bundle(request) -> JsonResponse:
     """
         Function to update a acl_bundle in database
 
@@ -149,9 +149,9 @@ def update_acl_bundle(request):
 
 
 @csrf_exempt
-def delete_acl_bundle(request, acl_bundle_id):
+def delete_acl_bundle(request, acl_bundle_id) -> JsonResponse:
     """
-        Function to set is_active to False on a acl_bundle in database
+        Function to set is_active to False on an acl_bundle in database
 
         Args:
             request: Request header containing authorization and method

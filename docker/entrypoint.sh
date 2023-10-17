@@ -11,7 +11,6 @@ then
     echo "PostgreSQL started"
 fi
 
-python manage.py flush --no-input
 echo "[1/2] Running migrations.."
 python manage.py migrate
 echo "[2/2] Starting server in development..."

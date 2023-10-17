@@ -35,7 +35,7 @@ def get_interests(request):
     try:
         interests = Interest.objects.all().values().filter(is_activate=filter)
     except Interest.DoesNotExist:
-        return api_response(HttpCode.SUCCESS, 'success', data=[])
+        return api_response(HttpCode.SUCCESS, 'success')
 
     normalizer = interests_normalizer(interests)
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)

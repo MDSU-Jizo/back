@@ -35,7 +35,7 @@ def get_languages(request):
     try:
         languages = Language.objects.all().values().filter(is_activate=filter)
     except Language.DoesNotExist:
-        return api_response(HttpCode.SUCCESS, 'success', data=[])
+        return api_response(HttpCode.SUCCESS, 'success')
 
     normalizer = languages_normalizer(languages)
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)

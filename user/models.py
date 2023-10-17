@@ -11,7 +11,7 @@ class User(models.Model):
     lastname = models.CharField(max_length=255, null=False)
     email = models.EmailField(max_length=255, null=False)
     birthdate = models.DateField(null=False)
-    gender = models.CharField(max_length=10, choices=Constants.GENDER_CHOICES, default=1, null=False)
+    gender = models.IntegerField(choices=Constants.GENDER_CHOICES, default=1, null=False)
     country = models.CharField(max_length=255, null=False)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
@@ -26,3 +26,6 @@ class User(models.Model):
     class Meta:
         """Define the name of the table"""
         db_table = 'user'
+
+    def __str__(self):
+        return f'id: {self.pk}, Firstname: {self.firstname}, Lastname: {self.lastname}, Email: {self.email}'

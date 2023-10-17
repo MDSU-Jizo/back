@@ -26,4 +26,5 @@ urlpatterns = [
     path('acl-route/', include('aclRoute.urls')),
     path('interest/', include('interest.urls')),
     path('language/', include('language.urls')),
+    path('itinerary/', include('itinerary.urls')),
 ]

@@ -12,3 +12,6 @@ class ItineraryInterest(models.Model):
     class Meta:
         """Define the name of the table"""
         db_table = 'itinerary_interest'
+
+    def __str__(self):
+        return f'Itinerary id: {self.itinerary.id}, Interest id: {self.interest.id}'

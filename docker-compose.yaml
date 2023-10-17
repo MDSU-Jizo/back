@@ -15,7 +15,7 @@ services:
       - "5432:5432"
     # Create a volume to persist database data
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data/
     # Link the network to the container
     networks:
       - backend

@@ -12,3 +12,6 @@ class RoleAclBundle(models.Model):
     class Meta:
         """Define the name of the table"""
         db_table = 'role_aclbundle'
+
+    def __str__(self):
+        return f'Role id: {self.role}, aclBoute id: {self.acl_bundle}'

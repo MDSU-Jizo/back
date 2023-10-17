@@ -35,7 +35,7 @@ def get_acl_routes(request):
     try:
         acl_routes = get_acl_routes_with_bundles(filter)
     except AclRoute.DoesNotExist:
-        return api_response(HttpCode.SUCCESS, 'success', data=[])
+        return api_response(HttpCode.SUCCESS, 'success')
 
     normalizer = acl_routes_normalizer(acl_routes)
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)

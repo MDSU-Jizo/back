@@ -14,4 +14,4 @@ class AclBundleAclRoute(models.Model):
         db_table = 'aclbundle_aclroute'
 
     def __str__(self):
-        return f'aclBundle id: {self.acl_bundle_id}, aclRoute id: {self.acl_route_id}'
+        return f'aclBundle id: {self.acl_bundle}, aclRoute id: {self.acl_route}'

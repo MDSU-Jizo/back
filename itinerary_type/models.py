@@ -12,3 +12,6 @@ class ItineraryType(models.Model):
     class Meta:
         """Define the name of the table"""
         db_table = 'itinerary_type'
+
+    def __str__(self):
+        return f'Itinerary id: {self.itinerary}, Type id: {self.type}'

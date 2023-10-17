@@ -13,11 +13,11 @@ class AclBundle(models.Model):
         """Define the name of the table"""
         db_table = 'aclbundle'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'id: {self.pk}, label: {self.label}, isActivate: ${self.is_activate}'
 
 
-def get_acl_bundles_with_routes(activate):
+def get_acl_bundles_with_routes(activate) -> AclBundle:
     """
         Custom request to fetch every bundle with their respective routes
 
@@ -41,7 +41,7 @@ def get_acl_bundles_with_routes(activate):
     )
 
 
-def get_acl_bundle_with_routes(bundle_id):
+def get_acl_bundle_with_routes(bundle_id) -> AclBundle:
     """
         Custom request to fetch a bundle with its respective routes
 

@@ -35,7 +35,7 @@ def get_levels(request):
     try:
         levels = Level.objects.all().values().filter(is_activate=filter)
     except Level.DoesNotExist:
-        return api_response(HttpCode.SUCCESS, 'success', data=[])
+        return api_response(HttpCode.SUCCESS, 'success')
 
     normalizer = levels_normalizer(levels)
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)

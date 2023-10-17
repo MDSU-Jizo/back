@@ -12,3 +12,6 @@ class Interest(models.Model):
     class Meta:
         """Define the name of the table"""
         db_table = 'interest'
+
+    def __str__(self):
+        return f'id: {self.pk}, Label: {self.label}, isActivate: {self.is_activate}'

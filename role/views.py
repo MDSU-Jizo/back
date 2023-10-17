@@ -35,7 +35,7 @@ def get_roles(request):
     try:
         roles = Role.objects.all().values().filter(is_activate=filter)
     except Role.DoesNotExist:
-        return api_response(HttpCode.SUCCESS, 'success', data=[])
+        return api_response(HttpCode.SUCCESS, 'success')
 
     normalizer = roles_normalizer(roles)
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
