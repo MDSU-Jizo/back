@@ -4,119 +4,25 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from datetime import datetime
 
+from itinerary_type.forms import ItineraryTypeForm
 from service.verify_method import verify_method
 from service.OpenAi.open_ai import prepare_prompt
 from service.api_response import send_json_response as api_response
 from contract.constants import Constants
-from .models import Itinerary
+from .models import Itinerary, get_itineraries_with_types_and_interests, get_itinerary_with_types_and_interests
 from .forms import ItineraryForm
 from .normalizers import itineraries_normalizer, itinerary_normalizer
 from itinerary_interest.forms import ItineraryInterestForm
+from .mockups import MockUps
 
 HttpCode = Constants.HttpResponseCodes
+Types = Constants.Types
 
-TEST_JSON = """
-{
-    "country": "France",
-    "itinerary": [
-        {
-            "city": "Paris",
-            "duration": 2,
-            "todo": [
-                {
-                    "name": "Eiffel Tower",
-                    "longitude": "2.2945",
-                    "latitude": "48.8584",
-                    "category": "Monument"
-                },
-                {
-                    "name": "Louvre Museum",
-                    "longitude": "2.3387",
-                    "latitude": "48.8606",
-                    "category": "Monument"
-                },
-                {
-                    "name": "Le Petit Cler",
-                    "longitude": "2.3387",
-                    "latitude": "48.8617",
-                    "category": "Gastronomy"
-                },
-                {
-                    "name": "Jardin des Tuileries",
-                    "longitude": "2.3317",
-                    "latitude": "48.8637",
-                    "category": "Nature"
-                }
-            ]
-        },
-        {
-            "city": "Nice",
-            "duration": 2,
-            "todo": [
-                {
-                    "name": "Promenade des Anglais",
-                    "longitude": "7.2662",
-                    "latitude": "43.6961",
-                    "category": "Discovering"
-                },
-                {
-                    "name": "Vieux Nice",
-                    "longitude": "7.2710",
-                    "latitude": "43.6984",
-                    "category": "Discovering"
-                },
-                {
-                    "name": "Chez Pipo",
-                    "longitude": "7.2710",
-                    "latitude": "43.6984",
-                    "category": "Gastronomy"
-                },
-                {
-                    "name": "Parc Phoenix",
-                    "longitude": "7.2662",
-                    "latitude": "43.6961",
-                    "category": "Nature"
-                }
-            ]
-        },
-        {
-            "city": "Paris",
-            "duration": 2,
-            "todo": [
-                {
-                    "name": "Notre Dame Cathedral",
-                    "longitude": "2.3470",
-                    "latitude": "48.8530",
-                    "category": "Monument"
-                },
-                {
-                    "name": "Arc de Triomphe",
-                    "longitude": "2.2950",
-                    "latitude": "48.8738",
-                    "category": "Monument"
-                },
-                {
-                    "name": "Le Petit Cler",
-                    "longitude": "2.3387",
-                    "latitude": "48.8617",
-                    "category": "Gastronomy"
-                },
-                {
-                    "name": "Jardin des Tuileries",
-                    "longitude": "2.3317",
-                    "latitude": "48.8637",
-                    "category": "Nature"
-                }
-            ]
-        }
-    ]
-}
-"""
 
 # TODO: Get Itineraries for current user
 
 
-def get_period_delta(start_date, end_date) -> int | False:
+def get_period_delta(start_date, end_date) -> int or False:
     """
         Function to return the period as the delta between start date and end date
 
@@ -132,19 +38,19 @@ def get_period_delta(start_date, end_date) -> int | False:
     end = datetime.strptime(end_date, "%Y-%m-%d")
     period = end - start
 
-    if period.days < 0:
+    if period.days < 0 :
         return False
 
-    return period
+    return period.days
 
 
-def link_interests_to_itinerary(request, interests, itinerary) -> True | JsonResponse:
+def link_interests_to_itinerary(request, interests, itinerary) -> True or JsonResponse:
     """
         Function to define interests in the given itinerary
 
         Args:
             request (request)
-            interests (dict): Dict of interest's int
+            interests (list): list of interest's int
             itinerary (Itinerary)
 
         Returns:
@@ -175,6 +81,43 @@ def link_interests_to_itinerary(request, interests, itinerary) -> True | JsonRes
     return True
 
 
+def link_types_to_itinerary(request, types, itinerary) -> True or JsonResponse:
+    """
+        Function to define interests in the given itinerary
+
+        Args:
+            request (request)
+            types (list): List of type's int
+            itinerary (Itinerary)
+
+        Returns:
+            True: Valid form
+            or
+            JsonResponse: Invalid form
+    """
+    for type in types:
+        data = {
+            'itinerary': itinerary,
+            'type': type
+        }
+
+        itinerary_type_form = ItineraryTypeForm(data)
+
+        if not itinerary_type_form.is_valid():
+            return api_response(
+                code=HttpCode.INTERNAL_SERVER_ERROR,
+                result='error',
+                message='Invalid form.',
+                data=itinerary_type_form.errors,
+                url=request.path,
+                payload=types
+            )
+
+        itinerary_type_form.save()
+
+    return True
+
+
 def get_itineraries(request) -> JsonResponse:
     """
         Function to return every itinerary
@@ -189,7 +132,7 @@ def get_itineraries(request) -> JsonResponse:
         return has_method
 
     try:
-        itineraries = Itinerary.objects.all().values()
+        itineraries = get_itineraries_with_types_and_interests()
     except Itinerary.DoesNotExist:
         return api_response(HttpCode.SUCCESS, 'success')
 
@@ -212,7 +155,7 @@ def get_itinerary(request, itinerary_id):
         return has_method
 
     try:
-        itinerary = Itinerary.objects.get(pk=itinerary_id)
+        itinerary = get_itinerary_with_types_and_interests(itinerary_id)
 
         if not itinerary:
             return api_response(code=HttpCode.NOT_FOUND, result='error', message='Itinerary not found.',
@@ -225,7 +168,7 @@ def get_itinerary(request, itinerary_id):
 
 
 @csrf_exempt
-def create_itinerary(request):
+def create_itinerary(request) -> JsonResponse:
     """
         Function to create an itinerary
 
@@ -240,7 +183,7 @@ def create_itinerary(request):
     if isinstance(has_method, JsonResponse):
         return has_method
 
-    if not request.body:
+    if not request.body or json.loads(request.body) == {}:
         return api_response(
             code=HttpCode.FORBIDDEN,
             result='error',
@@ -263,15 +206,48 @@ def create_itinerary(request):
 
     itinerary = form.save()
 
-    if content['interests']:
-        interests = link_interests_to_itinerary(request, content['interests'], itinerary.id)
+    if "interests" not in content:
+        return api_response(
+            code=HttpCode.BAD_REQUEST,
+            result='error',
+            message='Body must possess interests.',
+            url=request.path,
+            payload=content
+        )
 
-        if interests is not True:
-            return interests
+    interests = link_interests_to_itinerary(request, content['interests'], itinerary.id)
+
+    if interests is not True:
+        return interests
+
+    if "types" not in content:
+        return api_response(
+            code=HttpCode.BAD_REQUEST,
+            result='error',
+            message='Body must possess types.',
+            url=request.path,
+            payload=content
+        )
+
+    for trip_type in content['types']:
+        if (trip_type in [Types.ROADTRIP.value, Types.BACKPACKING.value, Types.HIKING.value]
+                and "level" not in content):
+            return api_response(
+                code=HttpCode.BAD_REQUEST,
+                result='error',
+                message='Body must possess level for that travel type.',
+                url=request.path,
+                payload=content
+            )
+
+    types = link_types_to_itinerary(request, content['types'], itinerary.id)
+
+    if types is not True:
+        return types
 
     period = get_period_delta(content['start_date'], content['end_date'])
 
-    if not period:
+    if isinstance(period, bool):
         return api_response(
             code=HttpCode.NOT_ALLOWED,
             result='error',
@@ -279,13 +255,23 @@ def create_itinerary(request):
             data={
                 'start': content['start_date'],
                 'end': content['end_date'],
-                'delta': period.days
             },
             url=request.path,
             payload=content
         )
 
     content['period'] = period
+
+    if request.GET.get('test'):
+        itinerary.response = MockUps.openai_response
+        itinerary.save()
+
+        return api_response(
+            code=HttpCode.CREATED,
+            result='success',
+            message='Itinerary created successfully.',
+            data=MockUps.openai_response
+        )
 
     response = prepare_prompt(user_inputs=content)
 
@@ -298,8 +284,6 @@ def create_itinerary(request):
         )
 
     itinerary.response = json.loads(response.choices[0].text)
-    # itinerary.response = json.loads(TEST_JSON)
-    itinerary.save()
 
     return api_response(
         code=HttpCode.CREATED,
@@ -308,16 +292,9 @@ def create_itinerary(request):
         data=json.loads(response.choices[0].text)
     )
 
-    # return api_response(
-    #     code=HttpCode.CREATED,
-    #     result='success',
-    #     message='Itinerary created successfully.',
-    #     data=json.loads(TEST_JSON)
-    # )
-
 
 @csrf_exempt
-def update_itinerary_title(request, itinerary_id):
+def update_itinerary_title(request, itinerary_id) -> JsonResponse:
     """
         Function to update the title of an itinerary
 
@@ -351,7 +328,7 @@ def update_itinerary_title(request, itinerary_id):
 
     content = json.loads(request.body.decode('utf-8'))
 
-    if not content['title']:
+    if "title" not in content:
         return api_response(
             code=HttpCode.BAD_REQUEST,
             result='error',
@@ -362,7 +339,7 @@ def update_itinerary_title(request, itinerary_id):
     itinerary.title = content['title']
     itinerary.save()
 
-    itineraries = Itinerary.objects.all().values()
+    itineraries = get_itineraries_with_types_and_interests()
     normalizer = itineraries_normalizer(itineraries)
 
     return api_response(
@@ -374,7 +351,7 @@ def update_itinerary_title(request, itinerary_id):
 
 
 @csrf_exempt
-def update_itinerary_steps(request):
+def update_itinerary_steps(request) -> JsonResponse:
     """
         Function to update an itinerary steps
 
@@ -390,7 +367,7 @@ def update_itinerary_steps(request):
         return has_method
 
     content = json.loads(request.body.decode('utf-8'))
-    if not content['id'] or not content['response']:
+    if "id" not in content or "response" not in content:
         return api_response(
             code=HttpCode.BAD_REQUEST,
             result='error',
@@ -419,7 +396,9 @@ def update_itinerary_steps(request):
     itinerary.response = content['response']
     itinerary.save()
 
-    normalizer = itinerary_normalizer(itinerary)
+    updated_itinerary = get_itinerary_with_types_and_interests(itinerary.id)
+
+    normalizer = itinerary_normalizer(updated_itinerary)
 
     return api_response(
         code=HttpCode.SUCCESS,
@@ -430,7 +409,7 @@ def update_itinerary_steps(request):
 
 
 @csrf_exempt
-def delete_itinerary(request, itinerary_id):
+def delete_itinerary(request, itinerary_id) -> JsonResponse:
     """
         Function to delete an itinerary
 
@@ -464,7 +443,7 @@ def delete_itinerary(request, itinerary_id):
     itinerary.delete()
 
     try:
-        itineraries = Itinerary.objects.all().values()
+        itineraries = get_itineraries_with_types_and_interests()
     except Itinerary.DoesNotExist:
         return api_response(HttpCode.SUCCESS, 'success')
 

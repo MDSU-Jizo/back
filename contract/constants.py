@@ -37,3 +37,13 @@ class Constants:
         ROLE_PREMIUM = 2
         ROLE_ADMIN = 3
         ROLE_SUPER_ADMIN = 4
+
+    class Types(Enum):
+        """
+            Type id enum
+        """
+        TOURISM = 1
+        ROADTRIP = 2
+        BACKPACKING = 3
+        HIKING = 4
+        DISCOVERING = 5

@@ -51,3 +51,62 @@ class Itinerary(models.Model):
             self.title = title
 
         super().save()
+
+
+def get_itineraries_with_types_and_interests():
+    return Itinerary.objects.raw(
+        """
+            SELECT 
+                i.*,
+                (
+                    SELECT array_agg(inte.label)
+                    FROM interest as inte
+                    WHERE inte.id IN (
+                        SELECT iin.interest_id
+                        FROM itinerary_interest AS iin
+                        WHERE iin.itinerary_id = i.id
+                    )
+                ) AS interests,
+                (
+                    SELECT array_agg(type.label)
+                    FROM type
+                    WHERE type.id IN (
+                        SELECT it.type_id
+                        FROM itinerary_type AS it
+                        WHERE it.itinerary_id = i.id
+                    )
+                ) AS types
+            FROM itinerary AS i
+            GROUP BY i.id
+        """
+    )
+
+
+def get_itinerary_with_types_and_interests(interest_id):
+    return Itinerary.objects.raw(
+        f"""
+            SELECT 
+                i.*,
+                (
+                    SELECT array_agg(inte.label)
+                    FROM interest as inte
+                    WHERE inte.id IN (
+                        SELECT iin.interest_id
+                        FROM itinerary_interest AS iin
+                        WHERE iin.itinerary_id = i.id
+                    )
+                ) AS interests,
+                (
+                    SELECT array_agg(type.label)
+                    FROM type
+                    WHERE type.id IN (
+                        SELECT it.type_id
+                        FROM itinerary_type AS it
+                        WHERE it.itinerary_id = i.id
+                    )
+                ) AS types
+            FROM itinerary AS i
+            WHERE i.id = {interest_id}
+            GROUP BY i.id
+        """
+    )

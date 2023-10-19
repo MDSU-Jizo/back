@@ -14,4 +14,4 @@ class Type(models.Model):
         db_table = 'type'
 
     def __str__(self):
-        return f'id: {self.pk}, label: {self.label}, isActivate: ${self.is_activate}'
+        return f'id: {self.pk}, label: {self.label}, isActivate: {self.is_activate}'
