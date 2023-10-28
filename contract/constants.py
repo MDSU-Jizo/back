@@ -45,5 +45,3 @@ class Constants:
         TOURISM = 1
         ROADTRIP = 2
         BACKPACKING = 3
-        HIKING = 4
-        DISCOVERING = 5

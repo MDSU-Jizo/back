@@ -2,6 +2,7 @@
     Service to return pre-formatted JsonResponse API
 """
 import logging
+import os
 
 from django.http import JsonResponse
 from contract.constants import Constants
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 http_codes = Constants.HttpResponseCodes
 
 
-def send_json_response(code=http_codes.SUCCESS, result='success', message='', data=None, url='', user='', payload=None):
+def send_json_response(code=http_codes.SUCCESS, result='success', message='', data=None, url='', user='', payload=None) -> JsonResponse:
     """
     Send response in JSON format. The response is returned with code, result and data.
 
@@ -30,7 +31,7 @@ def send_json_response(code=http_codes.SUCCESS, result='success', message='', da
     if data is None:
         data = []
 
-    if code.value >= 400:
+    if code.value >= 400 and os.getenv("ENV") == "prod":
         logger.error("Received error %s with the following message: %s", code.value, message)
         Webhook.discord(code=code, message=message, url=url, user=user, payload=payload, data=data)
 

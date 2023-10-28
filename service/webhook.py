@@ -25,7 +25,7 @@ class Webhook:
     """
 
     @staticmethod
-    def discord(code, message, url, user, payload, data=''):
+    def discord(code, message, url, user, payload, data='') -> None:
         """
             Send information to discord webhook
 

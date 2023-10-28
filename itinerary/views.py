@@ -158,8 +158,12 @@ def get_itinerary(request, itinerary_id):
         itinerary = get_itinerary_with_types_and_interests(itinerary_id)
 
         if not itinerary:
-            return api_response(code=HttpCode.NOT_FOUND, result='error', message='Itinerary not found.',
-                                url=request.path)
+            return api_response(
+                code=HttpCode.NOT_FOUND,
+                result='error',
+                message='Itinerary not found.',
+                url=request.path
+            )
     except Itinerary.DoesNotExist:
         return api_response(code=HttpCode.NOT_FOUND, result='error', message='Itinerary not found.', url=request.path)
 
@@ -185,7 +189,7 @@ def create_itinerary(request) -> JsonResponse:
 
     if not request.body or json.loads(request.body) == {}:
         return api_response(
-            code=HttpCode.FORBIDDEN,
+            code=HttpCode.BAD_REQUEST,
             result='error',
             message='Require a payload.',
             url=request.path,
@@ -326,6 +330,14 @@ def update_itinerary_title(request, itinerary_id) -> JsonResponse:
             url=request.path
         )
 
+    if not request.body or json.loads(request.body) == {}:
+        return api_response(
+            code=HttpCode.BAD_REQUEST,
+            result='error',
+            message='Require a payload.',
+            url=request.path,
+        )
+
     content = json.loads(request.body.decode('utf-8'))
 
     if "title" not in content:
@@ -365,6 +377,14 @@ def update_itinerary_steps(request) -> JsonResponse:
     has_method = verify_method(expected_method='PATCH', requested_method=request.method, requested_path=request.path)
     if isinstance(has_method, JsonResponse):
         return has_method
+
+    if not request.body or json.loads(request.body) == {}:
+        return api_response(
+            code=HttpCode.BAD_REQUEST,
+            result='error',
+            message='Require a payload.',
+            url=request.path,
+        )
 
     content = json.loads(request.body.decode('utf-8'))
     if "id" not in content or "response" not in content:

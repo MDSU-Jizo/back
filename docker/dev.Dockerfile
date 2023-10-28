@@ -1,5 +1,5 @@
 # base image
-FROM python:3.11.5-alpine
+FROM python:3.11.5
 
 # Define the author
 LABEL author="https://github.com/Maengdok" \
@@ -16,7 +16,8 @@ WORKDIR usr/src
 RUN mkdir /usr/src/staticfiles
 
 # Install system dependencies
-RUN apk update
+RUN apt-get update
+RUN apt-get install -y build-essential libssl-dev libffi-dev python3-dev postgresql-client
 
 # install dependencies
 RUN pip install --upgrade pip

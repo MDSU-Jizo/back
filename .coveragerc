@@ -1,0 +1,6 @@
+[run]
+omit =
+    */service/OpenAi/open_ai.py
+    */service/webhook.py
+    */service/api_response.py
+    */manage.py

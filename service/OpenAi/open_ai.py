@@ -1,7 +1,6 @@
 import os
 import openai
 import tiktoken
-import asyncio
 
 openai.organization = "org-saALfuKO0neOjgs0kVOo628C"
 openai.api_key = os.getenv("OPENAI_API_KEY")
