@@ -234,7 +234,7 @@ def create_itinerary(request) -> JsonResponse:
         )
 
     for trip_type in content['types']:
-        if (trip_type in [Types.ROADTRIP.value, Types.BACKPACKING.value, Types.HIKING.value]
+        if (trip_type in [Types.ROADTRIP.value, Types.BACKPACKING.value]
                 and "level" not in content):
             return api_response(
                 code=HttpCode.BAD_REQUEST,

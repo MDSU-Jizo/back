@@ -516,7 +516,7 @@ class MockUps:
     }
 
     create_itinerary_without_payload_response = {
-        "code": 403,
+        "code": 400,
         "result": "error",
         "message": "Require a payload.",
         "data": []
