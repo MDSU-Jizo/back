@@ -59,6 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         on_delete=models.CASCADE,
         default=Constants.Roles.ROLE_USER.value
     )
+    time_before_creating = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 

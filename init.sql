@@ -12,6 +12,18 @@ INSERT INTO type (id, label, is_activate) VALUES
 (2, 'Roadtrip', true),
 (3, 'Backpacking', true);
 
+INSERT INTO level (id, label, is_activate) VALUES
+(1, 'Beginner', true),
+(2, 'Intermediate', true),
+(3, 'Advanced', true);
+
+INSERT INTO interest (id, label, is_activate) VALUES
+(1, 'Culture', true),
+(2, 'Nature', true),
+(3, 'Discover', true),
+(4, 'Gastronomy', true),
+(5, 'Monument', true);
+
 INSERT INTO aclroute(id, label, is_activate) VALUES
 (1, '^.*$', true),
 (2, '^\/admin\/.*$', true),
@@ -58,11 +70,12 @@ INSERT INTO aclroute(id, label, is_activate) VALUES
 (43, '^\/language\/update$', true),
 (44, '^\/language\/delete\/[0-9]*$', true),
 (45, '^\/itinerary\/$', true),
-(46, '^\/itinerary\/details\/[0-9]*$', true),
-(47, '^\/itinerary\/update\/title\/[0-9]*$', true),
-(48, '^\/itinerary\/update$', true),
-(49, '^\/itinerary\/create', true),
-(50, '^\/itinerary\/delete\/[0-9]*$', true);
+(46, '^\/itinerary\/list$', true),
+(47, '^\/itinerary\/details\/[0-9]*$', true),
+(48, '^\/itinerary\/update\/title\/[0-9]*$', true),
+(49, '^\/itinerary\/update$', true),
+(50, '^\/itinerary\/create', true),
+(51, '^\/itinerary\/delete\/[0-9]*$', true);
 
 INSERT INTO aclbundle(id, label, is_activate) VALUES
 (1, 'USER_BUNDLE', true),
@@ -87,23 +100,25 @@ INSERT INTO aclbundle_aclroute(id, acl_bundle_id, acl_route_id) VALUES
 (16, 1, 48),
 (17, 1, 49),
 (18, 1, 50),
-(19, 2, 3),
-(20, 2, 4),
-(21, 2, 5),
-(22, 2, 6),
-(23, 2, 7),
-(24, 2, 8),
-(25, 2, 9),
-(26, 2, 10),
-(27, 2, 15),
-(28, 2, 35),
-(29, 2, 40),
-(30, 2, 45),
-(31, 2, 46),
-(32, 2, 47),
-(33, 2, 48),
-(34, 2, 49),
-(35, 2, 50);
+(19, 1, 51),
+(20, 2, 3),
+(21, 2, 4),
+(22, 2, 5),
+(23, 2, 6),
+(24, 2, 7),
+(25, 2, 8),
+(26, 2, 9),
+(27, 2, 10),
+(28, 2, 15),
+(29, 2, 35),
+(30, 2, 40),
+(31, 2, 45),
+(32, 2, 46),
+(33, 2, 47),
+(34, 2, 48),
+(35, 2, 49),
+(36, 2, 50),
+(37, 2, 51);
 
 INSERT INTO role_aclbundle(id, role_id, acl_bundle_id) VALUES
 (1, 1, 1),

@@ -18,6 +18,7 @@ class Itinerary(models.Model):
     level = models.ForeignKey('level.Level', on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey('user.User', on_delete=models.CASCADE, null=False)
     response = models.JSONField(null=True, blank=True)
+    is_activate = models.BooleanField(default=True, null=True, blank=True)
 
     @dataclasses.dataclass
     class Meta:
@@ -53,9 +54,9 @@ class Itinerary(models.Model):
         super().save()
 
 
-def get_itineraries_with_types_and_interests():
+def get_itineraries_with_types_and_interests(activate):
     return Itinerary.objects.raw(
-        """
+        f"""
             SELECT 
                 i.*,
                 (
@@ -77,12 +78,44 @@ def get_itineraries_with_types_and_interests():
                     )
                 ) AS types
             FROM itinerary AS i
+            WHERE i.is_activate = {activate}
             GROUP BY i.id
         """
     )
 
 
-def get_itinerary_with_types_and_interests(interest_id):
+def get_user_itineraries_with_types_and_interests(user_id, activate):
+    return Itinerary.objects.raw(
+        f"""
+            SELECT 
+                i.*,
+                (
+                    SELECT array_agg(inte.label)
+                    FROM interest as inte
+                    WHERE inte.id IN (
+                        SELECT iin.interest_id
+                        FROM itinerary_interest AS iin
+                        WHERE iin.itinerary_id = i.id
+                    )
+                ) AS interests,
+                (
+                    SELECT array_agg(type.label)
+                    FROM type
+                    WHERE type.id IN (
+                        SELECT it.type_id
+                        FROM itinerary_type AS it
+                        WHERE it.itinerary_id = i.id
+                    )
+                ) AS types
+            FROM itinerary AS i
+            WHERE i.user_id = {user_id}
+            AND i.is_activate = {activate}
+            GROUP BY i.id
+        """
+    )
+
+
+def get_itinerary_with_types_and_interests(interest_id, activate):
     return Itinerary.objects.raw(
         f"""
             SELECT 
@@ -107,6 +140,18 @@ def get_itinerary_with_types_and_interests(interest_id):
                 ) AS types
             FROM itinerary AS i
             WHERE i.id = {interest_id}
+            AND i.is_activate = {activate}
             GROUP BY i.id
+        """
+    )
+
+
+def count_user_itineraries(user_id):
+    return Itinerary.objects.raw(
+        f"""
+            SELECT
+                COUNT(i.*)
+            FROM itinerary AS i 
+            WHERE i.user_id = {user_id}
         """
     )

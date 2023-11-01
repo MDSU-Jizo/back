@@ -1,20 +1,15 @@
 """
     Middleware used to verify user's role on request
 """
-import os
 import logging
 import re
 
 from django.utils.deprecation import MiddlewareMixin
 from django.http import JsonResponse
-from django.urls import get_resolver, get_urlconf
 from contract.constants import Constants
 from service.api_response import send_json_response as api_response
-from role.models import Role
 from role_aclBundle.models import RoleAclBundle
 from aclBundle.models import AclBundle, get_acl_bundle_with_routes
-from aclBundle_aclRoute.models import AclBundleAclRoute
-from aclRoute.models import AclRoute
 
 logger = logging.getLogger(__name__)
 

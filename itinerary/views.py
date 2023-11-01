@@ -2,24 +2,23 @@ import json
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from datetime import datetime
+from datetime import datetime, timedelta, date
 
 from itinerary_type.forms import ItineraryTypeForm
 from service.verify_method import verify_method
 from service.OpenAi.open_ai import prepare_prompt
 from service.api_response import send_json_response as api_response
 from contract.constants import Constants
-from .models import Itinerary, get_itineraries_with_types_and_interests, get_itinerary_with_types_and_interests
+from .models import Itinerary, get_itineraries_with_types_and_interests, get_itinerary_with_types_and_interests, \
+    get_user_itineraries_with_types_and_interests, count_user_itineraries
 from .forms import ItineraryForm
 from .normalizers import itineraries_normalizer, itinerary_normalizer
 from itinerary_interest.forms import ItineraryInterestForm
+from user.models import User
 from .mockups import MockUps
 
 HttpCode = Constants.HttpResponseCodes
 Types = Constants.Types
-
-
-# TODO: Get Itineraries for current user
 
 
 def get_period_delta(start_date, end_date) -> int or False:
@@ -131,8 +130,26 @@ def get_itineraries(request) -> JsonResponse:
     if isinstance(has_method, JsonResponse):
         return has_method
 
+    activate = request.GET.get('isActivate', True)
+
     try:
-        itineraries = get_itineraries_with_types_and_interests()
+        itineraries = get_itineraries_with_types_and_interests(activate)
+    except Itinerary.DoesNotExist:
+        return api_response(HttpCode.SUCCESS, 'success')
+
+    normalizer = itineraries_normalizer(itineraries)
+    return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
+
+
+def get_user_itineraries(request) -> JsonResponse:
+    has_method = verify_method(expected_method='GET', requested_method=request.method, requested_path=request.path)
+    if isinstance(has_method, JsonResponse):
+        return has_method
+
+    activate = request.GET.get('isActivate', True)
+
+    try:
+        itineraries = get_user_itineraries_with_types_and_interests(request.user_id, activate)
     except Itinerary.DoesNotExist:
         return api_response(HttpCode.SUCCESS, 'success')
 
@@ -154,8 +171,10 @@ def get_itinerary(request, itinerary_id):
     if isinstance(has_method, JsonResponse):
         return has_method
 
+    activate = request.GET.get('isActivate', True)
+
     try:
-        itinerary = get_itinerary_with_types_and_interests(itinerary_id)
+        itinerary = get_itinerary_with_types_and_interests(itinerary_id, activate)
 
         if not itinerary:
             return api_response(
@@ -204,6 +223,29 @@ def create_itinerary(request) -> JsonResponse:
             result='error',
             message='Invalid form.',
             data=form.errors,
+            url=request.path,
+            payload=content
+        )
+
+    count = Itinerary.objects.filter(user_id=request.user_id).count()
+
+    print('FDP >>>', count, request.role['id'], Constants.Roles.ROLE_USER.value)
+    if count >= 3 and request.role['id'] == Constants.Roles.ROLE_USER.value:
+        user = User.objects.get(pk=request.user_id)
+        today = date.today()
+        if user.time_before_creating and user.time_before_creating > today:
+            return api_response(
+                code=HttpCode.NOT_ALLOWED,
+                result='error',
+                message=f'You can not create an itinerary until {user.time_before_creating}',
+                url=request.path,
+                payload=content
+            )
+
+        return api_response(
+            code=HttpCode.NOT_ALLOWED,
+            result='error',
+            message='You can not have more than 3 itineraries, delete one.',
             url=request.path,
             payload=content
         )
@@ -460,10 +502,16 @@ def delete_itinerary(request, itinerary_id) -> JsonResponse:
             url=request.path
         )
 
-    itinerary.delete()
+    today = date.today()
+    user = User.objects.get(pk=request.user_id)
+    expiration = today + timedelta(days=7)
+    user.time_before_creating = expiration
+    user.save()
+    itinerary.is_activate = False
+    itinerary.save()
 
     try:
-        itineraries = get_itineraries_with_types_and_interests()
+        itineraries = get_itineraries_with_types_and_interests(True)
     except Itinerary.DoesNotExist:
         return api_response(HttpCode.SUCCESS, 'success')
 
@@ -471,6 +519,6 @@ def delete_itinerary(request, itinerary_id) -> JsonResponse:
     return api_response(
         HttpCode.SUCCESS,
         result='success',
-        message='Itinerary delete successfully.',
+        message='Itinerary deleted successfully.',
         data=normalizer
     )
