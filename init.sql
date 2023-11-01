@@ -74,8 +74,6 @@ INSERT INTO aclbundle_aclroute(id, acl_bundle_id, acl_route_id) VALUES
 (1, 3, 1),
 (2, 1, 3),
 (3, 1, 4),
-(4, 1, 5),
-(5, 1, 6),
 (6, 1, 7),
 (7, 1, 8),
 (8, 1, 9),

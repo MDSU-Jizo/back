@@ -63,6 +63,8 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                     )
                     logger.info("JWT VERIFICATION MIDDLEWARE RESPONSE: %s", response)
 
+                    return response
+
                 request.jwt_token = token
                 request.user_id = userid
                 request.email = payload['email']
