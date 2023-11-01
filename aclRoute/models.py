@@ -14,7 +14,7 @@ class AclRoute(models.Model):
         db_table = 'aclroute'
 
     def __str__(self):
-        return f'id: {self.pk}, label: {self.label}, isActivate: ${self.is_activate}'
+        return f'id: {self.pk}, label: {self.label}, isActivate: {self.is_activate}'
 
 
 def get_acl_routes_with_bundles(activate):

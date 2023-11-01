@@ -4,7 +4,6 @@ import os
 import jwt
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.contrib.auth.models import update_last_login
 from passlib.hash import pbkdf2_sha256
 from datetime import date, timedelta

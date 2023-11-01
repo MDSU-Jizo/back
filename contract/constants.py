@@ -36,7 +36,6 @@ class Constants:
         ROLE_USER = 1
         ROLE_PREMIUM = 2
         ROLE_ADMIN = 3
-        ROLE_SUPER_ADMIN = 4
 
     class Types(Enum):
         """
@@ -45,3 +44,9 @@ class Constants:
         TOURISM = 1
         ROADTRIP = 2
         BACKPACKING = 3
+
+    EXCLUDED_PATHS = [
+        r'^/admin/.*$',
+        r'^/user/login$',
+        r'^/user/register$',
+    ]

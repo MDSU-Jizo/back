@@ -7,6 +7,7 @@ import jwt
 import re
 
 from django.utils.deprecation import MiddlewareMixin
+from django.http import JsonResponse
 from contract.constants import Constants
 from user.models import User
 from service.api_response import send_json_response as api_response
@@ -14,20 +15,16 @@ from service.api_response import send_json_response as api_response
 logger = logging.getLogger(__name__)
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-unauthenticated = Constants.HttpResponseCodes.UNAUTHENTICATED
+UNAUTHENTICATED = Constants.HttpResponseCodes.UNAUTHENTICATED
+_EXCLUDED_PATHS = Constants.EXCLUDED_PATHS
 
 
 class JwtVerificationMiddleware(MiddlewareMixin):
     """
         JWT Verification Middleware Class to process a request before it reached the endpoint
     """
-    _excluded_paths = [
-        r'^/admin/.*$',
-        r'^/user/login$',
-        r'^/user/register$',
-    ]
 
-    def process_request(self, request):
+    def process_request(self, request) -> JsonResponse | None:
         """
             Middleware handler to check JWT authentication
             Args:
@@ -37,14 +34,13 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                 JsonResponse from api_response
         """
         if self.verify_path(request):
-            print('true')
             return None
 
         authorization = request.headers.get('authorization', None)
 
         if str(authorization).find("Bearer ", 0) < 0:
             return api_response(
-                code=unauthenticated,
+                code=UNAUTHENTICATED,
                 result='error',
                 message='Invalid token.',
                 payload=authorization
@@ -61,7 +57,7 @@ class JwtVerificationMiddleware(MiddlewareMixin):
 
                 if not self.verify_user(payload):
                     response = api_response(
-                        code=unauthenticated,
+                        code=UNAUTHENTICATED,
                         result='error',
                         message='Invalid token.',
                     )
@@ -70,11 +66,12 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                 request.jwt_token = token
                 request.user_id = userid
                 request.email = payload['email']
+                request.role = payload['role']
 
                 return None
             except jwt.ExpiredSignatureError:
                 response = api_response(
-                    unauthenticated,
+                    UNAUTHENTICATED,
                     'error',
                     "Authentication token has expired."
                 )
@@ -83,7 +80,7 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                 return response
             except (jwt.DecodeError, jwt.InvalidTokenError):
                 response = api_response(
-                    unauthenticated,
+                    UNAUTHENTICATED,
                     'error',
                     "Authorization has failed, Please send valid token."
                 )
@@ -92,7 +89,7 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                 return response
 
         response = api_response(
-            unauthenticated,
+            UNAUTHENTICATED,
             'error',
             "Authorization not found, Please send valid token in headers."
         )
@@ -100,8 +97,9 @@ class JwtVerificationMiddleware(MiddlewareMixin):
 
         return response
 
-    def verify_path(self, request) -> bool:
-        for pattern in self._excluded_paths:
+    @staticmethod
+    def verify_path(request) -> bool:
+        for pattern in _EXCLUDED_PATHS:
             if re.match(pattern, request.path):
                 return True
         return False

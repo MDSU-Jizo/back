@@ -95,6 +95,7 @@ MIDDLEWARE = [
 
     # Project Middlewares
     'middleware.jwt_verification.JwtVerificationMiddleware',
+    'middleware.acl_verification.AclVerificationMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'

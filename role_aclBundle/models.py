@@ -14,4 +14,4 @@ class RoleAclBundle(models.Model):
         db_table = 'role_aclbundle'
 
     def __str__(self):
-        return f'Role id: {self.role}, aclBoute id: {self.acl_bundle}'
+        return f'Role: {self.role}, aclBundle: {self.acl_bundle}'
