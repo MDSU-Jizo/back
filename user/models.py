@@ -1,4 +1,5 @@
 """module to prevent pylint to return too-few-public-methods / R0903 error """
+import os
 import dataclasses
 import secrets
 
@@ -12,7 +13,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from contract.constants import Constants
 
 backend = default_backend()
-_ITERATIONS = 999999
+_ITERATIONS = int(os.getenv('ITERATIONS'))
 
 
 class UserManager(BaseUserManager):

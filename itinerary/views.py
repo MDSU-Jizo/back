@@ -1,3 +1,4 @@
+import os
 import json
 
 from django.http import JsonResponse
@@ -19,6 +20,8 @@ from .mockups import MockUps
 
 HttpCode = Constants.HttpResponseCodes
 Types = Constants.Types
+LIMIT = int(os.getenv('LIMIT'))
+EXPIRATION = int(os.getenv('EXPIRATION'))
 
 
 def get_period_delta(start_date, end_date) -> int or False:
@@ -229,7 +232,7 @@ def create_itinerary(request) -> JsonResponse:
 
     count = Itinerary.objects.filter(user_id=request.user_id).count()
 
-    if count >= 3 and request.role['id'] == Constants.Roles.ROLE_USER.value:
+    if count >= LIMIT and request.role['id'] == Constants.Roles.ROLE_USER.value:
         user = User.objects.get(pk=request.user_id)
         today = date.today()
         if user.time_before_creating and user.time_before_creating > today:
@@ -504,7 +507,7 @@ def delete_itinerary(request, itinerary_id) -> JsonResponse:
 
     today = date.today()
     user = User.objects.get(pk=request.user_id)
-    expiration = today + timedelta(days=7)
+    expiration = today + timedelta(days=EXPIRATION)
     user.time_before_creating = expiration
     user.save()
     itinerary.is_activate = False
