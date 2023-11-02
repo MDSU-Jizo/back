@@ -32,6 +32,9 @@ jobs:
       POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
       ELASTICSEARCH_URL: ${{ vars.ELASTICSEARCH_URL }}
+      DJANGO_LOG_LEVEL: ${{ vars.DJANGO_LOG_LEVEL }}
+      DEBUG: ${{ vars.DEBUG }}
+      ENV: ${{ vars.ENV }}
 
     steps:
       - name: Checkout code
