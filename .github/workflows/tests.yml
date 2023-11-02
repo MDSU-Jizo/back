@@ -25,6 +25,7 @@ jobs:
     env:
       DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
       ALLOWED_HOSTS: ${{ vars.ALLOWED_HOSTS }}
+      CSRF_TRUSTED_ORIGINS: ${{ vars.CSRF_TRUSTED_ORIGINS }}
 
     steps:
       - name: Checkout code
