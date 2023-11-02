@@ -43,9 +43,9 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                 code=UNAUTHENTICATED,
                 result='error',
                 message='Invalid token.',
-                payload=authorization
+                payload=authorization,
+                url=request.path
             )
-        logger.info("Request received for endpoint: %s", str(request.path))
 
         token = str.replace(str(authorization), "Bearer ", "")
 
@@ -53,15 +53,16 @@ class JwtVerificationMiddleware(MiddlewareMixin):
             try:
                 payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
                 userid = payload['id']
-                logger.info("Request received from user: %s", userid)
 
                 if not self.verify_user(payload):
                     response = api_response(
                         code=UNAUTHENTICATED,
                         result='error',
                         message='Invalid token.',
+                        payload=payload,
+                        user=userid,
+                        url=request.path
                     )
-                    logger.info("JWT VERIFICATION MIDDLEWARE RESPONSE: %s", response)
 
                     return response
 
@@ -73,29 +74,32 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                 return None
             except jwt.ExpiredSignatureError:
                 response = api_response(
-                    UNAUTHENTICATED,
-                    'error',
-                    "Authentication token has expired."
+                    code=UNAUTHENTICATED,
+                    result='error',
+                    message="Authentication token has expired.",
+                    payload=token,
+                    url=request.path
                 )
-                logger.info("JWT VERIFICATION MIDDLEWARE RESPONSE: %s", response)
 
                 return response
             except (jwt.DecodeError, jwt.InvalidTokenError):
                 response = api_response(
-                    UNAUTHENTICATED,
-                    'error',
-                    "Authorization has failed, Please send valid token."
+                    code=UNAUTHENTICATED,
+                    result='error',
+                    message="Authorization has failed, Please send valid token.",
+                    payload=token,
+                    url=request.path
                 )
-                logger.info("JWT VERIFICATION MIDDLEWARE RESPONSE: %s", response)
 
                 return response
 
         response = api_response(
-            UNAUTHENTICATED,
-            'error',
-            "Authorization not found, Please send valid token in headers."
+            code=UNAUTHENTICATED,
+            result='error',
+            message="Authorization not found, Please send valid token in headers.",
+            payload=authorization,
+            url=request.path
         )
-        logger.info("JWT VERIFICATION MIDDLEWARE RESPONSE: %s", response)
 
         return response
 

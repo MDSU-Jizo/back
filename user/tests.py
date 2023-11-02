@@ -3,7 +3,6 @@
 """
 import json
 
-from django.http import JsonResponse
 from django.test import TestCase, RequestFactory
 
 from .models import User

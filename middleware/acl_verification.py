@@ -32,7 +32,6 @@ class AclVerificationMiddleware(MiddlewareMixin):
             user=request.email,
             url=request.path
         )
-        logger.info("ACCESS REFUSED: %s", response)
 
         return response
 

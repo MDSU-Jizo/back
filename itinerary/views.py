@@ -229,7 +229,6 @@ def create_itinerary(request) -> JsonResponse:
 
     count = Itinerary.objects.filter(user_id=request.user_id).count()
 
-    print('FDP >>>', count, request.role['id'], Constants.Roles.ROLE_USER.value)
     if count >= 3 and request.role['id'] == Constants.Roles.ROLE_USER.value:
         user = User.objects.get(pk=request.user_id)
         today = date.today()
@@ -355,7 +354,7 @@ def update_itinerary_title(request, itinerary_id) -> JsonResponse:
         return has_method
 
     try:
-        itinerary = Itinerary.objects.get(pk=itinerary_id)
+        itinerary = Itinerary.objects.get(pk=itinerary_id, user=request.user_id)
 
         if not itinerary:
             return api_response(
@@ -393,7 +392,7 @@ def update_itinerary_title(request, itinerary_id) -> JsonResponse:
     itinerary.title = content['title']
     itinerary.save()
 
-    itineraries = get_itineraries_with_types_and_interests()
+    itineraries = get_itineraries_with_types_and_interests(True)
     normalizer = itineraries_normalizer(itineraries)
 
     return api_response(
@@ -438,7 +437,7 @@ def update_itinerary_steps(request) -> JsonResponse:
         )
 
     try:
-        itinerary = Itinerary.objects.get(pk=content['id'])
+        itinerary = Itinerary.objects.get(pk=content['id'], user=request.user_id)
 
         if not itinerary:
             return api_response(
@@ -458,7 +457,7 @@ def update_itinerary_steps(request) -> JsonResponse:
     itinerary.response = content['response']
     itinerary.save()
 
-    updated_itinerary = get_itinerary_with_types_and_interests(itinerary.id)
+    updated_itinerary = get_itinerary_with_types_and_interests(itinerary.id, True)
 
     normalizer = itinerary_normalizer(updated_itinerary)
 
@@ -484,8 +483,9 @@ def delete_itinerary(request, itinerary_id) -> JsonResponse:
     has_method = verify_method(expected_method='DELETE', requested_method=request.method, requested_path=request.path)
     if isinstance(has_method, JsonResponse):
         return has_method
+
     try:
-        itinerary = Itinerary.objects.get(pk=itinerary_id)
+        itinerary = Itinerary.objects.get(pk=itinerary_id, user=request.user_id)
 
         if not itinerary:
             return api_response(

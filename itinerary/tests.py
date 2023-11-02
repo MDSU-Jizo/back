@@ -5,6 +5,8 @@ import json
 
 from django.http import JsonResponse
 from django.test import TestCase, RequestFactory
+
+from user.views import encode_user_as_jwt
 from .models import Itinerary
 from .views import (
     get_period_delta,
@@ -22,8 +24,6 @@ from type.models import Type
 from user.models import User
 from language.models import Language
 from role.models import Role
-from itinerary_interest.models import ItineraryInterest
-from itinerary_type.models import ItineraryType
 from level.models import Level
 from .mockups import MockUps
 
@@ -151,6 +151,7 @@ class ItineraryTestCase(TestCase):
             data=MockUps.create_itinerary_payload,
             content_type='application/json'
         )
+        request.user_id = self.user.id
         response = create_itinerary(request)
 
         self.assertJSONEqual(response.content, MockUps.create_itinerary_response)
@@ -183,6 +184,7 @@ class ItineraryTestCase(TestCase):
             data=MockUps.create_itinerary_without_types_payload,
             content_type='application/json'
         )
+        request.user_id = self.user.id
         response = create_itinerary(request)
 
         self.assertJSONEqual(response.content, MockUps.create_itinerary_without_types_response)
@@ -193,6 +195,7 @@ class ItineraryTestCase(TestCase):
             data=MockUps.create_itinerary_without_interests_payload,
             content_type='application/json'
         )
+        request.user_id = self.user.id
         response = create_itinerary(request)
 
         self.assertJSONEqual(response.content, MockUps.create_itinerary_without_interests_response)
@@ -203,6 +206,7 @@ class ItineraryTestCase(TestCase):
             data=MockUps.create_itinerary_bad_delta_payload,
             content_type='application/json'
         )
+        request.user_id = self.user.id
         response = create_itinerary(request)
 
         self.assertJSONEqual(response.content, MockUps.create_itinerary_bad_delta_response)
@@ -214,6 +218,7 @@ class ItineraryTestCase(TestCase):
             data=MockUps.update_itinerary_title_payload,
             content_type='application/json'
         )
+        request.user_id = self.user.id
         response = update_itinerary_title(request, id)
         itineraries = json.loads(response.content)
 
@@ -230,6 +235,7 @@ class ItineraryTestCase(TestCase):
             data=MockUps.update_itinerary_title_payload,
             content_type='application/json'
         )
+        request.user_id = self.user.id
         response = update_itinerary_title(request, id)
 
         self.assertJSONEqual(response.content, MockUps.bad_method_on_patch_response)
@@ -241,6 +247,7 @@ class ItineraryTestCase(TestCase):
             data=MockUps.update_itinerary_title_as_int_type_payload,
             content_type='application/json'
         )
+        request.user_id = self.user.id
         response = update_itinerary_title(request, id)
         itineraries = json.loads(response.content)
 
@@ -257,6 +264,7 @@ class ItineraryTestCase(TestCase):
             data=MockUps.update_itinerary_title_as_int_type_payload,
             content_type='application/json'
         )
+        request.user_id = self.user.id
         response = update_itinerary_title(request, id)
 
         self.assertJSONEqual(response.content, MockUps.itinerary_not_found_response)
@@ -267,6 +275,7 @@ class ItineraryTestCase(TestCase):
             data=MockUps.update_itinerary_steps_payload,
             content_type='application/json'
         )
+        request.user_id = self.user.id
         response = update_itinerary_steps(request)
         itinerary = json.loads(response.content)
 
@@ -291,6 +300,7 @@ class ItineraryTestCase(TestCase):
             data=MockUps.update_itinerary_steps_on_itinerary_not_found_payload,
             content_type='application/json'
         )
+        request.user_id = self.user.id
         response = update_itinerary_steps(request)
 
         self.assertJSONEqual(response.content, MockUps.itinerary_not_found_response)
