@@ -31,6 +31,7 @@ jobs:
       POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
       POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+      ELASTICSEARCH_URL: ${{ vars.ELASTICSEARCH_URL }}
 
     steps:
       - name: Checkout code
