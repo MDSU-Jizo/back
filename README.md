@@ -1,7 +1,5 @@
 # Jizo - BackEnd
-
-> [!WARNING]
-> WORK IN PROGRESS
+[![codecov](https://codecov.io/gh/MDSU-Jizo/back/graph/badge.svg?token=WXSWLAGA9R)](https://codecov.io/gh/MDSU-Jizo/back)
 
 ## Requirements
 
@@ -44,8 +42,6 @@ docker exec -it postgres psql -U <username> -d <database>
 ```
 
 ## How does it work
-### Dev Environment
-
 ### Prod Environment
 
 The production environment has the `ELK` containers which allow \
