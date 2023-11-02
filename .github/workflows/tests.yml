@@ -56,7 +56,8 @@ jobs:
 
       - name: Prepare postgres database
         run: |
-          psql -c 'CREATE DATABASE "db_jizo";' -h db -U postgres
+          export PGPASSWORD=$POSTGRES_PASSWORD
+          psql -c 'CREATE DATABASE $POSTGRES_DB;' -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB
         if: matrix.database-engine == 'postgres'
 
       - name: Run tests
