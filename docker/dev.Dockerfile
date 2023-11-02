@@ -1,5 +1,5 @@
 # base image
-FROM python:3.11.5-alpine
+FROM python:3.11.5
 
 # Define the author
 LABEL author="https://github.com/Maengdok" \
@@ -8,15 +8,16 @@ LABEL author="https://github.com/Maengdok" \
 
 # The enviroment variable ensures that the python output is set straight
 # to the terminal with out buffering it first
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Switch to app directory so that everything runs from here
-WORKDIR app
-RUN mkdir /app/staticfiles
+WORKDIR usr/src
+RUN mkdir /usr/src/staticfiles
 
 # Install system dependencies
-RUN apk update
+RUN apt-get update
+RUN apt-get install -y build-essential libssl-dev libffi-dev python3-dev postgresql-client
 
 # install dependencies
 RUN pip install --upgrade pip
@@ -28,12 +29,12 @@ COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
 # copy entrypoint.sh
-COPY /docker/entrypoint.sh .
-RUN sed -i 's/\r$//g' /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN sed -i 's/\r$//g' /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Copy the app code to image working directory for the user
 COPY . .
 
 # run entrypoint.sh
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

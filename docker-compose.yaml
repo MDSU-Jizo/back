@@ -11,9 +11,11 @@ services:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_DB: "${POSTGRES_DB}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    ports:
+      - "5432:5432"
     # Create a volume to persist database data
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data/
     # Link the network to the container
     networks:
       - backend
@@ -34,11 +36,8 @@ services:
       - "8008:8000"
     # Mount the volume
     volumes:
-      - .:/jizo
+      - .:/usr/src
       - static_volume:/home/src/app/web/staticfiles
-    # Command used to run the server
-    command:
-      gunicorn app.wsgi:application --bind 0.0.0.0:8000 --reload
     # Cannot be launched without the db service fully working
     depends_on:
       - db
@@ -50,6 +49,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jizo.rule=Host(`jizo.dev`)"
+    tty: true
 
   traefik: # new
     image: traefik:v2.10
@@ -60,11 +60,28 @@ services:
     volumes:
       - "./docker/traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  pg-admin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmindata:/var/lib/pgadmin
+    networks:
+      - backend
 # List of named volumes
 # Allow to persist the volume even if the containers are down
 volumes:
   pgdata:
   static_volume:
+  pgadmindata:
 # List of networks
 networks:
   backend:
