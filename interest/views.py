@@ -4,7 +4,6 @@
 import json
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .models import Interest
 from .normalizers import interests_normalizer, interest_normalizer
 from .forms import InterestForm
@@ -15,7 +14,6 @@ from contract.constants import Constants
 HttpCode = Constants.HttpResponseCodes
 
 
-@csrf_exempt
 def get_interests(request):
     """
         Function to fetch every interest from database
@@ -41,7 +39,6 @@ def get_interests(request):
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
 
 
-@csrf_exempt
 def get_interest(request, interest_id):
     """
         Function to fetch every interest from database
@@ -68,7 +65,6 @@ def get_interest(request, interest_id):
     return api_response(code=HttpCode.SUCCESS, result='success', data=normalizer)
 
 
-@csrf_exempt
 def add_interest(request):
     """
         Function to add a interest in database
@@ -98,7 +94,6 @@ def add_interest(request):
     return api_response(code=HttpCode.CREATED, result='success', message='Interest created successfully.')
 
 
-@csrf_exempt
 def update_interest(request):
     """
         Function to update a interest in database
@@ -148,7 +143,6 @@ def update_interest(request):
     return api_response(code=HttpCode.SUCCESS, result='success', message='Interest updated successfully.')
 
 
-@csrf_exempt
 def delete_interest(request, interest_id):
     """
         Function to set is_active to False on a interest in database

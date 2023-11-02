@@ -14,7 +14,6 @@ from .forms import UserForm, UpdateForm, UpdateLanguage
 from .normalizers import jwt_normalizer, profile_normalizer, users_normalizer, user_normalizer
 from service.api_response import send_json_response as api_response
 from contract.constants import Constants
-from contract.custom_decorators import conditional_csrf_exempt
 
 HttpCode = Constants.HttpResponseCodes
 _KEY = os.getenv("JWT_SECRET_KEY")

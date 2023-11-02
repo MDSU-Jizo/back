@@ -4,7 +4,6 @@
 import json
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .models import AclBundle, get_acl_bundles_with_routes, get_acl_bundle_with_routes
 from .normalizers import acl_bundles_normalizer, acl_bundle_normalizer
 from .forms import AclBundleForm
@@ -15,7 +14,6 @@ from contract.constants import Constants
 HttpCode = Constants.HttpResponseCodes
 
 
-@csrf_exempt
 def get_acl_bundles(request) -> JsonResponse:
     """
         Function to fetch every acl_bundle from database
@@ -41,7 +39,6 @@ def get_acl_bundles(request) -> JsonResponse:
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
 
 
-@csrf_exempt
 def get_acl_bundle(request, acl_bundle_id) -> JsonResponse:
     """
         Function to fetch every acl_bundle from database
@@ -68,7 +65,6 @@ def get_acl_bundle(request, acl_bundle_id) -> JsonResponse:
     return api_response(code=HttpCode.SUCCESS, result='success', data=normalizer)
 
 
-@csrf_exempt
 def add_acl_bundle(request) -> JsonResponse:
     """
         Function to add a acl_bundle in database
@@ -98,7 +94,6 @@ def add_acl_bundle(request) -> JsonResponse:
     return api_response(code=HttpCode.CREATED, result='success', message='AclBundle created successfully.')
 
 
-@csrf_exempt
 def update_acl_bundle(request) -> JsonResponse:
     """
         Function to update a acl_bundle in database
@@ -148,7 +143,6 @@ def update_acl_bundle(request) -> JsonResponse:
     return api_response(code=HttpCode.SUCCESS, result='success', message='AclBundle updated successfully.')
 
 
-@csrf_exempt
 def delete_acl_bundle(request, acl_bundle_id) -> JsonResponse:
     """
         Function to set is_active to False on an acl_bundle in database

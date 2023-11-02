@@ -4,7 +4,6 @@
 import json
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .models import Type
 from .normalizers import types_normalizer, type_normalizer
 from .forms import TypeForm
@@ -65,7 +64,6 @@ def get_type(request, type_id):
     normalizer = type_normalizer(type)
     return api_response(code=HttpCode.SUCCESS, result='success', data=normalizer)
 
-@csrf_exempt
 def add_type(request):
     """
         Function to add a type in database
@@ -94,7 +92,6 @@ def add_type(request):
     form.save()
     return api_response(code=HttpCode.CREATED, result='success', message='Type created successfully.')
 
-@csrf_exempt
 def update_type(request):
     """
         Function to update a type in database
@@ -144,7 +141,6 @@ def update_type(request):
     return api_response(code=HttpCode.SUCCESS, result='success', message='Type updated successfully.')
 
 
-@csrf_exempt
 def delete_type(request, type_id):
     """
         Function to set is_active to False on a type in database

@@ -4,7 +4,6 @@
 import json
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .models import Role
 from .normalizers import roles_normalizer, role_normalizer
 from .forms import RoleForm
@@ -15,7 +14,6 @@ from contract.constants import Constants
 HttpCode = Constants.HttpResponseCodes
 
 
-@csrf_exempt
 def get_roles(request):
     """
         Function to fetch every role from database
@@ -41,7 +39,6 @@ def get_roles(request):
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
 
 
-@csrf_exempt
 def get_role(request, role_id):
     """
         Function to fetch every role from database
@@ -68,7 +65,6 @@ def get_role(request, role_id):
     return api_response(code=HttpCode.SUCCESS, result='success', data=normalizer)
 
 
-@csrf_exempt
 def add_role(request):
     """
         Function to add a role in database
@@ -98,7 +94,6 @@ def add_role(request):
     return api_response(code=HttpCode.CREATED, result='success', message='Role created successfully.')
 
 
-@csrf_exempt
 def update_role(request):
     """
         Function to update a role in database
@@ -148,7 +143,6 @@ def update_role(request):
     return api_response(code=HttpCode.SUCCESS, result='success', message='Role updated successfully.')
 
 
-@csrf_exempt
 def delete_role(request, role_id):
     """
         Function to set is_active to False on a role in database

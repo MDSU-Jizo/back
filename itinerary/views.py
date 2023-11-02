@@ -2,7 +2,6 @@ import os
 import json
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from datetime import datetime, timedelta, date
 
 from itinerary_type.forms import ItineraryTypeForm
@@ -193,7 +192,6 @@ def get_itinerary(request, itinerary_id):
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
 
 
-@csrf_exempt
 def create_itinerary(request) -> JsonResponse:
     """
         Function to create an itinerary
@@ -341,7 +339,6 @@ def create_itinerary(request) -> JsonResponse:
     )
 
 
-@csrf_exempt
 def update_itinerary_title(request, itinerary_id) -> JsonResponse:
     """
         Function to update the title of an itinerary
@@ -406,7 +403,6 @@ def update_itinerary_title(request, itinerary_id) -> JsonResponse:
     )
 
 
-@csrf_exempt
 def update_itinerary_steps(request) -> JsonResponse:
     """
         Function to update an itinerary steps
@@ -472,7 +468,6 @@ def update_itinerary_steps(request) -> JsonResponse:
     )
 
 
-@csrf_exempt
 def delete_itinerary(request, itinerary_id) -> JsonResponse:
     """
         Function to delete an itinerary

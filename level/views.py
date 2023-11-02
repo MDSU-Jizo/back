@@ -4,7 +4,6 @@
 import json
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .models import Level
 from .normalizers import levels_normalizer, level_normalizer
 from .forms import LevelForm
@@ -15,7 +14,6 @@ from contract.constants import Constants
 HttpCode = Constants.HttpResponseCodes
 
 
-@csrf_exempt
 def get_levels(request):
     """
         Function to fetch every level from database
@@ -41,7 +39,6 @@ def get_levels(request):
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
 
 
-@csrf_exempt
 def get_level(request, level_id):
     """
         Function to fetch every level from database
@@ -68,7 +65,6 @@ def get_level(request, level_id):
     return api_response(code=HttpCode.SUCCESS, result='success', data=normalizer)
 
 
-@csrf_exempt
 def add_level(request):
     """
         Function to add a level in database
@@ -98,7 +94,6 @@ def add_level(request):
     return api_response(code=HttpCode.CREATED, result='success', message='Level created successfully.')
 
 
-@csrf_exempt
 def update_level(request):
     """
         Function to update a level in database
@@ -148,7 +143,6 @@ def update_level(request):
     return api_response(code=HttpCode.SUCCESS, result='success', message='Level updated successfully.')
 
 
-@csrf_exempt
 def delete_level(request, level_id):
     """
         Function to set is_active to False on a level in database

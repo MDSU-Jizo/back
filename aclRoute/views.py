@@ -4,7 +4,6 @@
 import json
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .models import AclRoute, get_acl_routes_with_bundles, get_acl_route_with_bundles
 from .normalizers import acl_routes_normalizer, acl_route_normalizer
 from .forms import AclRouteForm
@@ -15,7 +14,6 @@ from contract.constants import Constants
 HttpCode = Constants.HttpResponseCodes
 
 
-@csrf_exempt
 def get_acl_routes(request):
     """
         Function to fetch every acl_route from database
@@ -41,7 +39,6 @@ def get_acl_routes(request):
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
 
 
-@csrf_exempt
 def get_acl_route(request, acl_route_id):
     """
         Function to fetch every acl_route from database
@@ -68,7 +65,6 @@ def get_acl_route(request, acl_route_id):
     return api_response(code=HttpCode.SUCCESS, result='success', data=normalizer)
 
 
-@csrf_exempt
 def add_acl_route(request):
     """
         Function to add a acl_route in database
@@ -98,7 +94,6 @@ def add_acl_route(request):
     return api_response(code=HttpCode.CREATED, result='success', message='AclRoute created successfully.')
 
 
-@csrf_exempt
 def update_acl_route(request):
     """
         Function to update a acl_route in database
@@ -148,7 +143,6 @@ def update_acl_route(request):
     return api_response(code=HttpCode.SUCCESS, result='success', message='AclRoute updated successfully.')
 
 
-@csrf_exempt
 def delete_acl_route(request, acl_route_id):
     """
         Function to set is_active to False on a acl_route in database

@@ -4,7 +4,6 @@
 import json
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .models import Language
 from .normalizers import languages_normalizer, language_normalizer
 from .forms import LanguageForm
@@ -15,7 +14,6 @@ from contract.constants import Constants
 HttpCode = Constants.HttpResponseCodes
 
 
-@csrf_exempt
 def get_languages(request):
     """
         Function to fetch every language from database
@@ -41,7 +39,6 @@ def get_languages(request):
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
 
 
-@csrf_exempt
 def get_language(request, language_id):
     """
         Function to fetch every language from database
@@ -68,7 +65,6 @@ def get_language(request, language_id):
     return api_response(code=HttpCode.SUCCESS, result='success', data=normalizer)
 
 
-@csrf_exempt
 def add_language(request):
     """
         Function to add a language in database
@@ -98,7 +94,6 @@ def add_language(request):
     return api_response(code=HttpCode.CREATED, result='success', message='Language created successfully.')
 
 
-@csrf_exempt
 def update_language(request):
     """
         Function to update a language in database
@@ -148,7 +143,6 @@ def update_language(request):
     return api_response(code=HttpCode.SUCCESS, result='success', message='Language updated successfully.')
 
 
-@csrf_exempt
 def delete_language(request, language_id):
     """
         Function to set is_active to False on a language in database
