@@ -58,7 +58,7 @@ jobs:
 
       - name: Run tests
         run: |
-          source ../.venv/bin/activate
+          source .venv/bin/activate
           export DJANGO_SETTINGS_MODULE=app.settings
           coverage run manage.py test
 
