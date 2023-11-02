@@ -29,7 +29,7 @@ jobs:
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       POSTGRES_USER: ${{ vars.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
-      POSTGRES_HOST: ${{ POSTGRES_HOST }}
+      POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
 
     steps:
       - name: Checkout code
