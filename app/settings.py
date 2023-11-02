@@ -38,6 +38,10 @@ SECRET_KEY = env('DJANGO_SK')
 DEBUG = bool(env('DEBUG'))
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(',')
+CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS").split(",")
+
+# Should be changed later on
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 INSTALLED_APPS = [
@@ -50,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third party apps
+    'corsheaders',
 
     # Project apps
     "aclBundle.apps.AclbundleConfig",
@@ -73,14 +78,24 @@ MIDDLEWARE = [
     # Django Middlewares
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # Third party Middlewares that should be placed
+    # before middlewares that generate responses
+    'corsheaders.middleware.CorsMiddleware',
+
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # Unused with React Native Front End
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # Third party Middlewares
     'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    # Project Middlewares
+    'middleware.jwt_verification.JwtVerificationMiddleware',
+    'middleware.acl_verification.AclVerificationMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'
@@ -103,7 +118,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -117,7 +131,6 @@ DATABASES = {
         'PORT': env('POSTGRES_PORT'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -137,6 +150,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL  = "user.User"
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -148,7 +162,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -219,17 +232,4 @@ LOGGING = {
     },
 }
 
-# CONSTANTS
-
-ROLES = {
-    'ROLE_USER': 1,
-    'ROLE_PREMIUM': 2,
-    'ROLE_ADMIN': 3,
-    'ROLE_SUPER_ADMIN': 4,
-}
-
-GENDER_CHOICES = [
-    (1, "Male"),
-    (2, "Female"),
-    (3, "Other"),
-]
+WEBHOOK_URL = env('WEBHOOK_URL')
