@@ -48,7 +48,7 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.jizo.rule=Host(`jizo.dev`)"
+      - "traefik.http.routers.django.rule=Host(`jizo.dev`)"
     tty: true
 
   traefik: # new

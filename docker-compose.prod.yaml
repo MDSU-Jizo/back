@@ -48,11 +48,6 @@ services:
     image: postgres
     # Rename it postgres to avoid being named 'db-1'
     container_name: postgres
-    labels: # new
-      - "traefik.enable=true"
-      - "traefik.http.routers.django.rule=Host(`traefik.jizo.app`)"
-      - "traefik.http.routers.django.tls=true"
-      - "traefik.http.routers.django.tls.certresolver=letsencrypt"
     env_file:
       - .env
     # Define every required environment variables
@@ -75,13 +70,18 @@ services:
     container_name: jizo
     # Rename the image
     image: jizo_backend
+    labels: # new
+      - "traefik.enable=true"
+      - "traefik.http.routers.django.rule=Host(`traefik.jizo.app`)"
+      - "traefik.http.routers.django.tls=true"
+      - "traefik.http.routers.django.tls.certresolver=letsencrypt"
     # Point to the prod.Dockerfile used for the build
     build:
       # prod.Dockerfile which is located in the same directory as the docker-compose.yaml
       context: .
       dockerfile: docker/prod.Dockerfile
-    ports:
-      - "8008:8000"
+    expose:
+      - "8000"
     # Mount the volume
     volumes:
       - .:/home/python/web
@@ -103,13 +103,14 @@ services:
     # Declare variable that will be used in the container
     environment:
       - LOGSTASH_HOST=logstash
+      - DJANGO_ALLOWED_HOSTS=.jizo.app
 
   traefik:
     container_name: traefik
     build:
       context: docker/traefik/
     ports:
-      - "8000:80"
+      - "80:80"
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
