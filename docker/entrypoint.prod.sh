@@ -17,9 +17,9 @@ python manage.py migrate
 echo "[1/3] <<< Migration done"
 
 echo "[2/3] >>> Importing datas into database..."
-. /usr/src/.env
+. /home/python/web/.env
 export PGPASSWORD=$POSTGRES_PASSWORD
-psql --host=$POSTGRES_HOST --username=$POSTGRES_USER --dbname=$POSTGRES_DB -a -f ./init.sql
+psql --host=$POSTGRES_HOST --username=$POSTGRES_USER --dbname=$POSTGRES_DB -a -f /home/python/web/init.sql
 echo "[2/3] <<< Importation done"
 
 echo "[3/3] >>> Creating super user..."

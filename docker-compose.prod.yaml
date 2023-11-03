@@ -84,7 +84,7 @@ services:
       - "8008:8000"
     # Mount the volume
     volumes:
-      - .:/jizo
+      - .:/home/python/web
       - static_volume:/home/app/web/staticfiles
     # Command used to run the server
     command:
