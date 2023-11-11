@@ -70,11 +70,6 @@ services:
     container_name: jizo
     # Rename the image
     image: jizo_backend
-    labels: # new
-      - "traefik.enable=true"
-      - "traefik.http.routers.django.rule=Host(`traefik.jizo.app`)"
-      - "traefik.http.routers.django.tls=true"
-      - "traefik.http.routers.django.tls.certresolver=letsencrypt"
     # Point to the prod.Dockerfile used for the build
     build:
       # prod.Dockerfile which is located in the same directory as the docker-compose.yaml
@@ -109,22 +104,70 @@ services:
     container_name: traefik
     build:
       context: docker/traefik/
+    command:
+      - --api.insecure=true
+      - --providers.docker
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # Logs for traefik inside the container
+      - --log.level=DEBUG
+      - --log.filePath=/opt/traefik/traefik.log
+      - --log.format=json
+      - --accesslog=true
+      - --accesslog.filepath=/opt/traefik/access.log
+      - --accesslog.bufferingsize=100
+      - --accesslog.format=json
+      # Letsencrypt tls challenge
+      - --certificatesresolvers.myresolver.acme.tlschallenge=true
+        #- --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.myresolver.acme.email=jizo.app@outlook.fr
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
     ports:
       - "80:80"
       - "443:443"
+      - "8000:8000"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik-public-certificates:/certificates"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`dashboard-traefik.jizo.app`)"
-      - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.docker.network=traefik"
+      # Dashboard
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard.jizo.app`)"
       - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=default"
+      # API middleware
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.X-Frame-Options=SAMEORIGIN"
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.X-Content-Type-Options=nosniff"
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.Content-Security-Policy=frame-ancestors 'self'"
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.Permission-Policy=interest-cohort=()"
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.Strict-Transport-Security=max-age=31536000; includeSubDomains"
+      # API
+      - "traefik.http.routers.api.rule=Host(`back.jizo.app`)"
+      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.tls.certresolver=default"
+      - "traefik.http.services.api.loadbalancer.server.port=8000"
+      - "traefik.http.routers.api.middlewares=jizo-headers"
+      # Landing
+      - "traefik.http.routers.landing.rule=Host(`jizo.app`)"
+      - "traefik.http.routers.landing.service=landing"
+      - "traefik.http.routers.landing.entrypoints=websecure"
+      - "traefik.http.routers.landing.tls.certresolver=default"
+      # Basic middleware auth
+      - "traefik.http.routers.api.middlewares=auth"
       - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD}"
+      # middleware redirect
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      # global redirect to https
+      - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.redirs.entrypoints=web"
+      - "traefik.http.routers.redirs.middlewares=redirect-to-https"
     networks:
-      - server
+      - backend
+      - traefik
 
   # data indexer
   elastic:
@@ -263,5 +306,6 @@ volumes:
 # List of networks
 networks:
   backend:
-  server:
   elk:
+  traefik:
+    driver: bridge
