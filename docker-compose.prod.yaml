@@ -75,13 +75,30 @@ services:
       # prod.Dockerfile which is located in the same directory as the docker-compose.yaml
       context: .
       dockerfile: docker/prod.Dockerfile
-    expose:
-      - "8000"
+      #expose:
+      #- "8000"
     # Mount the volume
     volumes:
       - .:/home/python/web
       - static_volume:/home/app/web/staticfiles
     # Command used to run the server
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=routing"
+      # API middlewares
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.X-Frame-Options=SAMEORIGIN"
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.X-Content-Type-Options=nosniff"
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.Content-Security-Policy=frame-ancestors 'self'"
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.Permission-Policy=interest-cohort=()"
+      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.Strict-Transport-Security=max-age=31536000; includeSubDomains"
+      # API
+      - "traefik.http.routers.api.rule=Host(`back.jizo.app`)"
+        #- "traefik.http.routers.api.service=jizo"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.tls.certresolver=myresolver"
+      - "traefik.http.routers.api.middlewares=jizo-headers"
+      - "traefik.http.services.api.loadbalancer.server.port=8000"
     command:
       gunicorn app.wsgi:application --bind 0.0.0.0:8000
     # Cannot be launched without the db service fully working
@@ -92,23 +109,26 @@ services:
     # Link the network to the container
     networks:
       - backend
+      - routing
     # Set the type of logging
     logging:
       driver: "json-file"
     # Declare variable that will be used in the container
     environment:
       - LOGSTASH_HOST=logstash
-      - DJANGO_ALLOWED_HOSTS=.jizo.app
+      - ALLOWED_HOSTS=back.jizo.app
 
   traefik:
     container_name: traefik
     build:
       context: docker/traefik/
     command:
-      - --api.insecure=true
+      - --api.insecure=false
       - --providers.docker
+      - --providers.docker.exposedByDefault=false
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls.certresolver=myresolver
       # Logs for traefik inside the container
       - --log.level=DEBUG
       - --log.filePath=/opt/traefik/traefik.log
@@ -118,56 +138,38 @@ services:
       - --accesslog.bufferingsize=100
       - --accesslog.format=json
       # Letsencrypt tls challenge
-      - --certificatesresolvers.myresolver.acme.tlschallenge=true
-        #- --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.myresolver.acme.httpchallenge=true
+      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
+      # Uncomment the line below if you are using Let's Encrypt staging server
+      #- --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
       - --certificatesresolvers.myresolver.acme.email=jizo.app@outlook.fr
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
     ports:
       - "80:80"
       - "443:443"
-      - "8000:8000"
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./letsencrypt:/letsencrypt
+      - ./letsencrypt:/letsencrypt:rw,Z
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=traefik"
+      - "traefik.docker.network=routing"
       # Dashboard
       - "traefik.http.routers.dashboard.rule=Host(`dashboard.jizo.app`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.tls.certresolver=default"
-      # API middleware
-      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
-      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.X-Frame-Options=SAMEORIGIN"
-      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.X-Content-Type-Options=nosniff"
-      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.Content-Security-Policy=frame-ancestors 'self'"
-      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.Permission-Policy=interest-cohort=()"
-      - "traefik.http.middlewares.jizo-headers.headers.customresponseheaders.Strict-Transport-Security=max-age=31536000; includeSubDomains"
-      # API
-      - "traefik.http.routers.api.rule=Host(`back.jizo.app`)"
-      - "traefik.http.routers.api.service=api@internal"
-      - "traefik.http.routers.api.entrypoints=websecure"
-      - "traefik.http.routers.api.tls.certresolver=default"
-      - "traefik.http.services.api.loadbalancer.server.port=8000"
-      - "traefik.http.routers.api.middlewares=jizo-headers"
-      # Landing
-      - "traefik.http.routers.landing.rule=Host(`jizo.app`)"
-      - "traefik.http.routers.landing.service=landing"
-      - "traefik.http.routers.landing.entrypoints=websecure"
-      - "traefik.http.routers.landing.tls.certresolver=default"
+      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
       # Basic middleware auth
-      - "traefik.http.routers.api.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD}"
-      # middleware redirect
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=<user>:<password>"
+      # Middleware redirect
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      # global redirect to https
-      - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
+      # Global redirect to https
+      #- "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.redirs.entrypoints=web"
       - "traefik.http.routers.redirs.middlewares=redirect-to-https"
     networks:
-      - backend
-      - traefik
+      - routing
 
   # data indexer
   elastic:
@@ -198,6 +200,7 @@ services:
     # Link container to a network
     networks:
       - elk
+      - routing
     restart: unless-stopped
 
   # Log collector
@@ -243,18 +246,28 @@ services:
     ports:
       - "5601:5601"
     # Set the dependence to elastic container
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=routing"
+      - "traefik.http.routers.kibana.rule=Host(`kibana.jizo.app`)"
+      - "traefik.http.routers.kibana.entrypoints=websecure"
+      - "traefik.http.routers.kibana.tls.certresolver=myresolver"
+      - "traefik.http.services.kibana.loadbalancer.server.port=5601"
+      # Basic middleware auth
+      - "traefik.http.routers.kibana.middlewares=auth"
+
     depends_on:
       - elastic
     # Link container to a network
     networks:
       - elk
+      - routing
     # Declare variable that will be used in the container
     environment:
       KIBANA_PASSWORD: "${KIBANA_PASSWORD:-}"
     volumes:
       - ./docker/kibana/kibana.yaml:/usr/share/kibana/config/kibana.yml:ro
     restart: unless-stopped
-
 
   # Log centralizer
   filebeat:
@@ -307,5 +320,6 @@ volumes:
 networks:
   backend:
   elk:
-  traefik:
-    driver: bridge
+  routing:
+          name: routing
+          external: true
