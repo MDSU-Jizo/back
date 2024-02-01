@@ -161,7 +161,7 @@ services:
       - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
       # Basic middleware auth
       - "traefik.http.routers.dashboard.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=<user>:<password>"
+      - "traefik.http.middlewares.auth.basicauth.users=maengdok:$$apr1$$AdzVJbcx$$xpKv.Sw1xRF17im.5wQpB/"
       # Middleware redirect
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       # Global redirect to https
@@ -255,6 +255,7 @@ services:
       - "traefik.http.services.kibana.loadbalancer.server.port=5601"
       # Basic middleware auth
       - "traefik.http.routers.kibana.middlewares=auth"
+        #- "traefik.http.middlewares.auth.basicauth.users=maengdok:$$apr1$$AdzVJbcx$$xpKv.Sw1xRF17im.5wQpB/"
 
     depends_on:
       - elastic
