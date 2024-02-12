@@ -4,6 +4,8 @@ class MockUps:
         "itinerary": [
             {
                 "city": "Paris",
+                "latitude": "48.866667",
+                "longitude": "2.333333",
                 "duration": 2,
                 "todo": [
                     {
@@ -34,6 +36,8 @@ class MockUps:
             },
             {
                 "city": "Nice",
+                "latitude": "43.700000.",
+                "longitude": "7.250000",
                 "duration": 2,
                 "todo": [
                     {
@@ -64,6 +68,8 @@ class MockUps:
             },
             {
                 "city": "Paris",
+                "latitude": "48.866667",
+                "longitude": "2.333333",
                 "duration": 2,
                 "todo": [
                     {
@@ -100,6 +106,8 @@ class MockUps:
         "itinerary": [
             {
                 "city": "Paris",
+                "latitude": "48.866667",
+                "longitude": "2.333333",
                 "duration": 2,
                 "todo": [
                     {
@@ -130,6 +138,8 @@ class MockUps:
             },
             {
                 "city": "Nice",
+                "latitude": "43.700000.",
+                "longitude": "7.250000",
                 "duration": 2,
                 "todo": [
                     {
@@ -160,6 +170,8 @@ class MockUps:
             },
             {
                 "city": "Paris",
+                "latitude": "48.866667",
+                "longitude": "2.333333",
                 "duration": 2,
                 "todo": [
                     {
@@ -252,93 +264,99 @@ class MockUps:
                 "itinerary": [
                     {
                         "city": "Paris",
+                        "latitude": "48.866667",
+                        "longitude": "2.333333",
+                        "duration": 2,
                         "todo": [
                             {
                                 "name": "Eiffel Tower",
-                                "category": "Monument",
+                                "longitude": "2.2945",
                                 "latitude": "48.8584",
-                                "longitude": "2.2945"
+                                "category": "Monument"
                             },
                             {
                                 "name": "Louvre Museum",
-                                "category": "Monument",
+                                "longitude": "2.3387",
                                 "latitude": "48.8606",
-                                "longitude": "2.3387"
+                                "category": "Monument"
                             },
                             {
                                 "name": "Le Petit Cler",
-                                "category": "Gastronomy",
+                                "longitude": "2.3387",
                                 "latitude": "48.8617",
-                                "longitude": "2.3387"
+                                "category": "Gastronomy"
                             },
                             {
                                 "name": "Jardin des Tuileries",
-                                "category": "Nature",
+                                "longitude": "2.3317",
                                 "latitude": "48.8637",
-                                "longitude": "2.3317"
+                                "category": "Nature"
                             }
-                        ],
-                        "duration": 2
+                        ]
                     },
                     {
                         "city": "Nice",
+                        "latitude": "43.700000.",
+                        "longitude": "7.250000",
+                        "duration": 2,
                         "todo": [
                             {
                                 "name": "Promenade des Anglais",
-                                "category": "Discovering",
+                                "longitude": "7.2662",
                                 "latitude": "43.6961",
-                                "longitude": "7.2662"
+                                "category": "Discovering"
                             },
                             {
                                 "name": "Vieux Nice",
-                                "category": "Discovering",
+                                "longitude": "7.2710",
                                 "latitude": "43.6984",
-                                "longitude": "7.2710"
+                                "category": "Discovering"
                             },
                             {
                                 "name": "Chez Pipo",
-                                "category": "Gastronomy",
+                                "longitude": "7.2710",
                                 "latitude": "43.6984",
-                                "longitude": "7.2710"
+                                "category": "Gastronomy"
                             },
                             {
                                 "name": "Parc Phoenix",
-                                "category": "Nature",
+                                "longitude": "7.2662",
                                 "latitude": "43.6961",
-                                "longitude": "7.2662"
+                                "category": "Nature"
                             }
-                        ],
-                        "duration": 2
+                        ]
                     },
                     {
                         "city": "Paris",
+                        "latitude": "48.866667",
+                        "longitude": "2.333333",
+                        "duration": 2,
                         "todo": [
                             {
                                 "name": "Notre Dame Cathedral",
-                                "category": "Monument",
+                                "longitude": "2.3470",
                                 "latitude": "48.8530",
-                                "longitude": "2.3470"
+                                "category": "Monument"
                             },
                             {
                                 "name": "Arc de Triomphe",
-                                "category": "Monument",
+                                "longitude": "2.2950",
                                 "latitude": "48.8738",
-                                "longitude": "2.2950"
+                                "category": "Monument"
                             },
                             {
                                 "name": "Le Petit Cler",
-                                "category": "Gastronomy",
+                                "longitude": "2.3387",
                                 "latitude": "48.8617",
-                                "longitude": "2.3387"
+                                "category": "Gastronomy"
                             },
                             {
                                 "name": "Jardin des Tuileries",
-                                "category": "Nature",
+                                "longitude": "2.3317",
                                 "latitude": "48.8637",
-                                "longitude": "2.3317"
+                                "category": "Nature"
                             }
-                        ],
-                        "duration": 2
+                        ]
                     }
                 ]
             }
@@ -423,6 +441,8 @@ class MockUps:
             "itinerary": [
                 {
                     "city": "Paris",
+                    "latitude": "48.866667",
+                    "longitude": "2.333333",
                     "duration": 2,
                     "todo": [
                         {
@@ -453,6 +473,8 @@ class MockUps:
                 },
                 {
                     "city": "Nice",
+                    "latitude": "43.700000.",
+                    "longitude": "7.250000",
                     "duration": 2,
                     "todo": [
                         {
@@ -483,6 +505,8 @@ class MockUps:
                 },
                 {
                     "city": "Paris",
+                    "latitude": "48.866667",
+                    "longitude": "2.333333",
                     "duration": 2,
                     "todo": [
                         {
@@ -716,14 +740,10 @@ class MockUps:
             "itinerary": [
                 {
                     "city": "Paris",
+                    "latitude": "48.866667",
+                    "longitude": "2.333333",
                     "duration": 2,
                     "todo": [
-                        {
-                            "name": "Le Petit Cler",
-                            "longitude": "2.3387",
-                            "latitude": "48.8617",
-                            "category": "Gastronomy"
-                        },
                         {
                             "name": "Eiffel Tower",
                             "longitude": "2.2945",
@@ -737,6 +757,12 @@ class MockUps:
                             "category": "Monument"
                         },
                         {
+                            "name": "Le Petit Cler",
+                            "longitude": "2.3387",
+                            "latitude": "48.8617",
+                            "category": "Gastronomy"
+                        },
+                        {
                             "name": "Jardin des Tuileries",
                             "longitude": "2.3317",
                             "latitude": "48.8637",
@@ -746,6 +772,8 @@ class MockUps:
                 },
                 {
                     "city": "Nice",
+                    "latitude": "43.700000.",
+                    "longitude": "7.250000",
                     "duration": 2,
                     "todo": [
                         {
@@ -753,12 +781,6 @@ class MockUps:
                             "longitude": "7.2662",
                             "latitude": "43.6961",
                             "category": "Discovering"
-                        },
-                        {
-                            "name": "Parc Phoenix",
-                            "longitude": "7.2662",
-                            "latitude": "43.6961",
-                            "category": "Nature"
                         },
                         {
                             "name": "Vieux Nice",
@@ -771,17 +793,31 @@ class MockUps:
                             "longitude": "7.2710",
                             "latitude": "43.6984",
                             "category": "Gastronomy"
+                        },
+                        {
+                            "name": "Parc Phoenix",
+                            "longitude": "7.2662",
+                            "latitude": "43.6961",
+                            "category": "Nature"
                         }
                     ]
                 },
                 {
                     "city": "Paris",
+                    "latitude": "48.866667",
+                    "longitude": "2.333333",
                     "duration": 2,
                     "todo": [
                         {
                             "name": "Notre Dame Cathedral",
                             "longitude": "2.3470",
                             "latitude": "48.8530",
+                            "category": "Monument"
+                        },
+                        {
+                            "name": "Arc de Triomphe",
+                            "longitude": "2.2950",
+                            "latitude": "48.8738",
                             "category": "Monument"
                         },
                         {
@@ -795,12 +831,6 @@ class MockUps:
                             "longitude": "2.3317",
                             "latitude": "48.8637",
                             "category": "Nature"
-                        },
-                        {
-                            "name": "Arc de Triomphe",
-                            "longitude": "2.2950",
-                            "latitude": "48.8738",
-                            "category": "Monument"
                         }
                     ]
                 }
@@ -835,14 +865,10 @@ class MockUps:
                 "itinerary": [
                     {
                         "city": "Paris",
+                        "latitude": "48.866667",
+                        "longitude": "2.333333",
                         "duration": 2,
                         "todo": [
-                            {
-                                "name": "Le Petit Cler",
-                                "longitude": "2.3387",
-                                "latitude": "48.8617",
-                                "category": "Gastronomy"
-                            },
                             {
                                 "name": "Eiffel Tower",
                                 "longitude": "2.2945",
@@ -856,6 +882,12 @@ class MockUps:
                                 "category": "Monument"
                             },
                             {
+                                "name": "Le Petit Cler",
+                                "longitude": "2.3387",
+                                "latitude": "48.8617",
+                                "category": "Gastronomy"
+                            },
+                            {
                                 "name": "Jardin des Tuileries",
                                 "longitude": "2.3317",
                                 "latitude": "48.8637",
@@ -865,6 +897,8 @@ class MockUps:
                     },
                     {
                         "city": "Nice",
+                        "latitude": "43.700000.",
+                        "longitude": "7.250000",
                         "duration": 2,
                         "todo": [
                             {
@@ -872,12 +906,6 @@ class MockUps:
                                 "longitude": "7.2662",
                                 "latitude": "43.6961",
                                 "category": "Discovering"
-                            },
-                            {
-                                "name": "Parc Phoenix",
-                                "longitude": "7.2662",
-                                "latitude": "43.6961",
-                                "category": "Nature"
                             },
                             {
                                 "name": "Vieux Nice",
@@ -890,17 +918,31 @@ class MockUps:
                                 "longitude": "7.2710",
                                 "latitude": "43.6984",
                                 "category": "Gastronomy"
+                            },
+                            {
+                                "name": "Parc Phoenix",
+                                "longitude": "7.2662",
+                                "latitude": "43.6961",
+                                "category": "Nature"
                             }
                         ]
                     },
                     {
                         "city": "Paris",
+                        "latitude": "48.866667",
+                        "longitude": "2.333333",
                         "duration": 2,
                         "todo": [
                             {
                                 "name": "Notre Dame Cathedral",
                                 "longitude": "2.3470",
                                 "latitude": "48.8530",
+                                "category": "Monument"
+                            },
+                            {
+                                "name": "Arc de Triomphe",
+                                "longitude": "2.2950",
+                                "latitude": "48.8738",
                                 "category": "Monument"
                             },
                             {
@@ -914,12 +956,6 @@ class MockUps:
                                 "longitude": "2.3317",
                                 "latitude": "48.8637",
                                 "category": "Nature"
-                            },
-                            {
-                                "name": "Arc de Triomphe",
-                                "longitude": "2.2950",
-                                "latitude": "48.8738",
-                                "category": "Monument"
                             }
                         ]
                     }
@@ -936,14 +972,10 @@ class MockUps:
             "itinerary": [
                 {
                     "city": "Paris",
+                    "latitude": "48.866667",
+                    "longitude": "2.333333",
                     "duration": 2,
                     "todo": [
-                        {
-                            "name": "Le Petit Cler",
-                            "longitude": "2.3387",
-                            "latitude": "48.8617",
-                            "category": "Gastronomy"
-                        },
                         {
                             "name": "Eiffel Tower",
                             "longitude": "2.2945",
@@ -957,6 +989,12 @@ class MockUps:
                             "category": "Monument"
                         },
                         {
+                            "name": "Le Petit Cler",
+                            "longitude": "2.3387",
+                            "latitude": "48.8617",
+                            "category": "Gastronomy"
+                        },
+                        {
                             "name": "Jardin des Tuileries",
                             "longitude": "2.3317",
                             "latitude": "48.8637",
@@ -966,6 +1004,8 @@ class MockUps:
                 },
                 {
                     "city": "Nice",
+                    "latitude": "43.700000.",
+                    "longitude": "7.250000",
                     "duration": 2,
                     "todo": [
                         {
@@ -973,12 +1013,6 @@ class MockUps:
                             "longitude": "7.2662",
                             "latitude": "43.6961",
                             "category": "Discovering"
-                        },
-                        {
-                            "name": "Parc Phoenix",
-                            "longitude": "7.2662",
-                            "latitude": "43.6961",
-                            "category": "Nature"
                         },
                         {
                             "name": "Vieux Nice",
@@ -991,17 +1025,31 @@ class MockUps:
                             "longitude": "7.2710",
                             "latitude": "43.6984",
                             "category": "Gastronomy"
+                        },
+                        {
+                            "name": "Parc Phoenix",
+                            "longitude": "7.2662",
+                            "latitude": "43.6961",
+                            "category": "Nature"
                         }
                     ]
                 },
                 {
                     "city": "Paris",
+                    "latitude": "48.866667",
+                    "longitude": "2.333333",
                     "duration": 2,
                     "todo": [
                         {
                             "name": "Notre Dame Cathedral",
                             "longitude": "2.3470",
                             "latitude": "48.8530",
+                            "category": "Monument"
+                        },
+                        {
+                            "name": "Arc de Triomphe",
+                            "longitude": "2.2950",
+                            "latitude": "48.8738",
                             "category": "Monument"
                         },
                         {
@@ -1015,12 +1063,6 @@ class MockUps:
                             "longitude": "2.3317",
                             "latitude": "48.8637",
                             "category": "Nature"
-                        },
-                        {
-                            "name": "Arc de Triomphe",
-                            "longitude": "2.2950",
-                            "latitude": "48.8738",
-                            "category": "Monument"
                         }
                     ]
                 }

@@ -50,7 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, null=False, unique=True)
     password = models.CharField(max_length=255, null=False)
     birthdate = models.DateField(null=True, blank=True)
-    gender = models.IntegerField(choices=Constants.GENDER_CHOICES, default=None, null=True)
+    gender = models.IntegerField(choices=Constants.GENDER_CHOICES, default=None, blank=True, null=True)
     country = models.CharField(max_length=255, null=True, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
