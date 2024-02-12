@@ -46,9 +46,9 @@ class Itinerary(models.Model):
             self.ending_city = self.starting_city
         if not self.title:
             if self.ending_city == self.starting_city:
-                title = f"{self.starting_city} ({self.start_date} - {self.end_date})"
+                title = f"{self.starting_city}"
             else:
-                title = f"{self.starting_city} - {self.ending_city} ({self.start_date} - {self.end_date})"
+                title = f"{self.starting_city} - {self.ending_city}"
             self.title = title
 
         super().save()

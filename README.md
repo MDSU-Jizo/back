@@ -7,7 +7,9 @@
 
 ## Before build
 
-Create a .env file at the root of the project (Where the README is located) in which you will copy/paste then fill the content of the .env.sample file.
+Create a .env file at the root of the project (Where the README is located) in which you will copy/paste the content of the .env.sample file then fill.
+> [!WARNING]
+> If you have randomly generated password that contains symbols, set them between quotes in the .env file to avoid any error
 
 ## How to build
 

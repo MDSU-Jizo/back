@@ -83,6 +83,10 @@ MIDDLEWARE = [
     # before middlewares that generate responses
     'corsheaders.middleware.CorsMiddleware',
 
+    # Project Middlewares
+    'middleware.jwt_verification.JwtVerificationMiddleware',
+    'middleware.acl_verification.AclVerificationMiddleware',
+
     'django.middleware.common.CommonMiddleware',
     # Unused with React Native Front End
     # 'django.middleware.csrf.CsrfViewMiddleware',
@@ -92,10 +96,6 @@ MIDDLEWARE = [
 
     # Third party Middlewares
     'whitenoise.middleware.WhiteNoiseMiddleware',
-
-    # Project Middlewares
-    'middleware.jwt_verification.JwtVerificationMiddleware',
-    'middleware.acl_verification.AclVerificationMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'

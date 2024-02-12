@@ -330,12 +330,13 @@ def create_itinerary(request) -> JsonResponse:
         )
 
     itinerary.response = json.loads(response.choices[0].text)
+    itinerary.save()
 
     return api_response(
         code=HttpCode.CREATED,
         result='success',
         message='Itinerary created successfully.',
-        data=json.loads(response.choices[0].text)
+        data=itinerary.response
     )
 
 

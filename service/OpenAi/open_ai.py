@@ -9,7 +9,7 @@ openai.Model.list()
 N_MAX_ACTIVITIES = 4
 N_MAX_STEPS = 4
 # MODEL_ENGINE = "babbage-002"
-MODEL_ENGINE = "text-davinci-003"
+MODEL_ENGINE = "gpt-3.5-turbo-instruct"
 # MODEL_ENGINE = "gpt-3.5-turbo"
 MAX_TOKENS = 1100
 
@@ -52,12 +52,12 @@ and a breakdown of the itinerary with locations to visit"""
         prompt += f"Generate the JSON itinerary with {N_MAX_STEPS} steps"
 
     prompt += f"""
-Each step should include {N_MAX_ACTIVITIES} activities or points of interest If 'Multiple Cities' is set to 'True' 
-The itinerary must include steps with different cities 
+Each step should include {N_MAX_ACTIVITIES} activities or points of interest If 'Multiple Cities' is set to 'True'
+The itinerary must include steps with different cities
 must start at the 'starting City'
-The 'endingCity' must be the last step 
-The itinerary should align with the user's interests 
-and if 'Traveling with Children' is set to 'True' 
+The 'endingCity' must be the last step
+The itinerary should align with the user's interests
+and if 'Traveling with Children' is set to 'True'
 add a few kid-friendly activities
 Ensure no repeated visits to the same place and suggest a national restaurant at least once a day
 Also, provide latitude and longitude for every place to visit
@@ -68,6 +68,8 @@ expected JSON format:
   "itinerary": [
     {{
       "city": "[City]",
+      "longitude": "[Longitude]",
+      "latitude": "[Latitude]",
       "duration": [Duration for this city],
       "todo": [
         {{
