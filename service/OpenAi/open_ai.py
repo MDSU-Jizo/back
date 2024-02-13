@@ -11,7 +11,7 @@ N_MAX_STEPS = 4
 # MODEL_ENGINE = "babbage-002"
 MODEL_ENGINE = "gpt-3.5-turbo-instruct"
 # MODEL_ENGINE = "gpt-3.5-turbo"
-MAX_TOKENS = 1100
+MAX_TOKENS = 4096
 
 
 def token_count(prompt) -> int:
@@ -19,17 +19,18 @@ def token_count(prompt) -> int:
     return len(encoding.encode(prompt))
 
 
-def send_prompt(prompt):
+def send_prompt(prompt, used_tokens):
     response = openai.Completion.create(
         model=MODEL_ENGINE,
         prompt=prompt,
-        max_tokens=MAX_TOKENS,
+        max_tokens=MAX_TOKENS - used_tokens,
         n=1,
         stop="####",
-        temperature=0.0,
+        temperature=0.8,
     )
 
     print('response:', response.choices[0].text)
+    print('response token count:', response.usage.total_tokens)
     return response
 
 
@@ -60,7 +61,7 @@ The itinerary should align with the user's interests
 and if 'Traveling with Children' is set to 'True'
 add a few kid-friendly activities
 Ensure no repeated visits to the same place and suggest a national restaurant at least once a day
-Also, provide latitude and longitude for every place to visit
+Also, provide latitude and longitude in decimal degrees for every place to visit
 Only return the JSON
 expected JSON format:
 {{
@@ -68,14 +69,14 @@ expected JSON format:
   "itinerary": [
     {{
       "city": "[City]",
-      "longitude": "[Longitude]",
       "latitude": "[Latitude]",
+      "longitude": "[Longitude]",
       "duration": [Duration for this city],
       "todo": [
         {{
           "name": "[Name of Attraction/Place/Restaurant]",
-          "longitude": "[Longitude]",
           "latitude": "[Latitude]",
+          "longitude": "[Longitude]",
           "category": "[Category]"
         }}
       ]
@@ -83,6 +84,9 @@ expected JSON format:
   ]
 }}"""
 
+    prompt += "\nEnsure the correct order of latitude and longitude in the generated coordinates. latitude must come first then longitude"
+
     print(prompt)
-    print('User prompt token count:', token_count(prompt))
-    return send_prompt(prompt)
+    used_tokens = token_count(prompt)
+    print('User prompt token count:', used_tokens)
+    return send_prompt(prompt, used_tokens)
