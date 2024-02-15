@@ -1,6 +1,6 @@
-INSERT INTO language (id, label, is_activate) VALUES
-(1, 'French', true),
-(2, 'English', true);
+INSERT INTO language (id, label, shortened, is_activate) VALUES
+(1, 'French', 'fr', true),
+(2, 'English', 'en', true);
 
 INSERT INTO role (id, label, is_activate) VALUES
 (1, 'ROLE_USER', true),

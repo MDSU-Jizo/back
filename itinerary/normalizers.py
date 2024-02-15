@@ -39,6 +39,7 @@ def itineraries_normalizer(itineraries):
                 'id': itinerary.user.id,
                 'display_name': itinerary.user.firstname + " " + itinerary.user.lastname,
                 'email': itinerary.user.email,
+                'time_before_creating': itinerary.user.time_before_creating,
             },
         }
 
