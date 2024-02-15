@@ -18,6 +18,7 @@ def languages_normalizer(languages):
         item = {
             'id': language['id'],
             'label': language['label'],
+            'shortened': language['shortened'],
             'isActivate': language['is_activate'],
         }
 

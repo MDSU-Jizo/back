@@ -26,7 +26,7 @@ def send_prompt(prompt, used_tokens):
         max_tokens=MAX_TOKENS - used_tokens,
         n=1,
         stop="####",
-        temperature=0.8,
+        temperature=1.0,
     )
 
     print('response:', response.choices[0].text)
