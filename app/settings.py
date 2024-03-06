@@ -80,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
 
     # Third party Middlewares that should be placed
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     # before middlewares that generate responses
     'corsheaders.middleware.CorsMiddleware',
 
@@ -93,9 +94,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # Third party Middlewares
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'
@@ -168,7 +166,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
