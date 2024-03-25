@@ -1,6 +1,8 @@
 import os
 import openai
 import tiktoken
+from type.models import Type
+from interest.models import Interest
 
 openai.organization = "org-saALfuKO0neOjgs0kVOo628C"
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -46,6 +48,17 @@ def prepare_prompt(user_inputs):
 The JSON should include details on the country
 the duration of the trip
 and a breakdown of the itinerary with locations to visit"""
+
+    tmp_types = []
+    for travel_type in user_inputs['types']:
+        tmp_types.append(Type.objects.get(pk=travel_type).label)
+    user_inputs['types'] = tmp_types
+
+    tmp_interests = []
+    for travel_interest in user_inputs['interests']:
+        tmp_interests.append(Interest.objects.get(pk=travel_interest).label)
+    user_inputs['interests'] = tmp_interests
+    user_inputs.pop('user')
 
     prompt += str(user_inputs)
 
