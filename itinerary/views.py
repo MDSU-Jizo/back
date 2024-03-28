@@ -331,8 +331,17 @@ def create_itinerary(request) -> JsonResponse:
             data=content
         )
 
-    itinerary.response = json.loads(response.choices[0].text)
-    itinerary.save()
+    try:
+        itinerary.response = json.loads(response.choices[0].text)
+        itinerary.save()
+    except json.decoder.JSONDecodeError:
+        itinerary.delete()
+
+        return api_response(
+            code=HttpCode.INTERNAL_SERVER_ERROR,
+            result='error',
+            message='The AI could not generate the steps, the itinerary has not been created. Try again.'
+        )
 
     return api_response(
         code=HttpCode.CREATED,
