@@ -55,7 +55,7 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                 userid = payload['id']
 
                 if not self.verify_user(payload):
-                    response = api_response(
+                    return api_response(
                         code=UNAUTHENTICATED,
                         result='error',
                         message='Invalid token.',
@@ -64,8 +64,6 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                         url=request.path
                     )
 
-                    return response
-
                 request.jwt_token = token
                 request.user_id = userid
                 request.email = payload['email']
@@ -73,7 +71,7 @@ class JwtVerificationMiddleware(MiddlewareMixin):
 
                 return None
             except jwt.ExpiredSignatureError:
-                response = api_response(
+                return api_response(
                     code=UNAUTHENTICATED,
                     result='error',
                     message="Authentication token has expired.",
@@ -81,9 +79,8 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                     url=request.path
                 )
 
-                return response
             except (jwt.DecodeError, jwt.InvalidTokenError):
-                response = api_response(
+                return api_response(
                     code=UNAUTHENTICATED,
                     result='error',
                     message="Authorization has failed, Please send valid token.",
@@ -91,17 +88,13 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                     url=request.path
                 )
 
-                return response
-
-        response = api_response(
+        return api_response(
             code=UNAUTHENTICATED,
             result='error',
             message="Authorization not found, Please send valid token in headers.",
             payload=authorization,
             url=request.path
         )
-
-        return response
 
     @staticmethod
     def verify_path(request) -> bool:
