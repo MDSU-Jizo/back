@@ -1,6 +1,8 @@
 import os
 import tiktoken
 import openai
+from openai.types.chat.chat_completion import ChatCompletion
+
 from type.models import Type
 from interest.models import Interest
 
@@ -21,16 +23,20 @@ def token_count(prompt) -> int: # TODO: update method to count tokens
     return len(encoding.encode(prompt))
 
 
-def send_prompt(prompt):
-    response = openai.chat.completions.create(
-        model=MODEL_ENGINE,
-        messages=prompt,
-        max_tokens=MAX_TOKENS,
-        response_format={"type": "json_object"},
-        n=1,
-        stop="####",
-        temperature=1.0,
-    )
+def send_prompt(prompt, used_tokens) -> Exception | ChatCompletion:
+    try:
+        response = openai.chat.completions.create(
+            model=MODEL_ENGINE,
+            messages=prompt,
+            max_tokens=MAX_TOKENS - used_tokens,
+            response_format={"type": "json_object"},
+            n=1,
+            stop="####",
+            temperature=1.0,
+        )
+
+    except openai.BadRequestError as exception:
+        return exception
 
     print('response:', response.choices[0].message.content)
     print('response token count:', response.usage.total_tokens)
@@ -47,46 +53,52 @@ def prepare_prompt(user_inputs):
     """
     language = "french" if user_inputs['language'] == "fr" else "english"
 
-    system_prompt = """
-    You are an expert in backpacking travels and travels in general
-    Generate a personalized travel itinerary based on user inputs
-    the itinerary should include the duration of the trip for each step
-    and a breakdown of the itinerary with locations to visit
-    """
-
-    system_prompt += f"""
-    Each step should include a minimum of {N_MAX_ACTIVITIES} activities or points of interest If 'Multiple Cities' is set to 'True' else only return an itinerary about the 'starting City' and activities near it
-    The itinerary must include steps with different cities and must start at the 'starting City' and the 'endingCity' must be the last step
-    If no 'starting City' sets the last step must be the same as the 'starting City'
-    The itinerary should align with the user's interests and if the user has set 'Traveling with Children' to 'True' add a few kid-friendly activities else don't
-    Ensure no repeated visits to the same place and suggest a national restaurant at least once a day
-    Also, provide latitude and longitude in decimal degrees for every place to visit
-    latitude must come first then longitude
-    The value must be in {language}
-    expected JSON format:
-    {{
-      "country": "[Country]",
-      "itinerary": [
-        {{
-          "city": "[City]",
-          "latitude": "[Latitude]",
-          "longitude": "[Longitude]",
-          "duration": [Duration for this city],
-          "todo": [
-            {{
-              "name": "[Name of Attraction/Place/Restaurant]",
-              "latitude": "[Latitude]",
-              "longitude": "[Longitude]",
-              "category": "[Category]"
-            }}
-          ]
-        }}
-      ]
-    }}
-    """
+    system_prompt = f"""
+Generate a personalized travel itinerary based on user inputs for a backpacking trip. 
+Your task is to craft an itinerary tailored to the user's preferences, 
+including the duration of the trip for each step, 
+locations to visit, and points of interest. Each step should contain a minimum of {N_MAX_ACTIVITIES} activities or points of interest.
+If 'multiple_cities' is set to 'True', the itinerary should cover multiple cities; 
+otherwise, focus on the 'starting_city'. 
+Ensure a minimum of {N_MAX_STEPS} steps and/or {N_MAX_ACTIVITIES} activities close to the starting city that fit the trip's duration. 
+The itinerary must start at the 'starting_city' and end at the 'ending_city', 
+unless 'ending_city' is not specified, in which case the last step must be the same as the starting city.
+If 'multiple_cities' is not set to 'True', 
+ensure that the itinerary includes at least {N_MAX_STEPS} steps around the 'starting_city', 
+each containing a minimum of {N_MAX_ACTIVITIES} activities.
+The itinerary should align with the user's interests. 
+If 'with_children' is set to 'True', include kid-friendly activities; 
+otherwise, exclude them.
+Avoid repeated visits to the same place and suggest a national restaurant at least once a day.
+Provide latitude and longitude in decimal degrees for each place to visit, with latitude first followed by longitude. 
+The values should be in {language}.
+"""
 
     if user_inputs.get('steps') is None:
         system_prompt += f" Generate the JSON itinerary with a minimum of {N_MAX_STEPS} steps"
+
+    system_prompt += """
+expected JSON format:
+{{
+  "country": "[Country]",
+  "itinerary": [
+    {{
+      "city": "[City]",
+      "latitude": "[Latitude]",
+      "longitude": "[Longitude]",
+      "duration": [Duration for this city],
+      "todo": [
+        {{
+          "name": "[Name of Attraction/Place/Restaurant]",
+          "latitude": "[Latitude]",
+          "longitude": "[Longitude]",
+          "category": "[Category]"
+        }}
+      ]
+    }}
+  ]
+}}
+"""
 
     tmp_types = []
     for travel_type in user_inputs['types']:
@@ -112,6 +124,8 @@ def prepare_prompt(user_inputs):
     # """
 
     print(prompt)
-    #used_tokens = token_count(prompt) # TODO: update method to count tokens
-    #print('User prompt token count:', used_tokens)
-    return send_prompt(prompt)
+    system_tokens = token_count(prompt[0]['content']) # TODO: update method to count tokens
+    user_tokens = token_count(prompt[0]['content']) # TODO: update method to count tokens
+    print('System prompt token count:', system_tokens)
+    print('User prompt token count:', user_tokens)
+    return send_prompt(prompt, system_tokens + user_tokens)

@@ -53,7 +53,7 @@ simplejson==3.19.1
 social-auth-app-django==5.4.0
 social-auth-core==4.4.2
 sqlparse==0.4.4
-tiktoken==0.5.1
+tiktoken==0.6.0
 tomlkit==0.12.1
 tqdm==4.66.1
 typing_extensions==4.8.0

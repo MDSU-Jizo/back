@@ -1,5 +1,6 @@
 import os
 import json
+import openai
 
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
@@ -39,7 +40,7 @@ def get_period_delta(start_date, end_date) -> int or False:
     end = datetime.strptime(end_date, "%Y-%m-%d")
     period = end - start
 
-    if period.days < 0 :
+    if period.days < 0:
         return False
 
     return period.days
@@ -324,12 +325,14 @@ def create_itinerary(request) -> JsonResponse:
 
     response = prepare_prompt(user_inputs=content)
 
-    if not response.choices[0].message.content:
+    if isinstance(response, openai.BadRequestError):
+        itinerary.delete()
+
         return api_response(
             code=HttpCode.INTERNAL_SERVER_ERROR,
             result='error',
             message='Could not create an itinerary, retry later.',
-            data=content
+            data=response.message
         )
 
     try:
