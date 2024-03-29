@@ -68,6 +68,10 @@ class JwtVerificationMiddleware(MiddlewareMixin):
                 request.user_id = userid
                 request.email = payload['email']
                 request.role = payload['role']
+                if payload.get("language") is not None:
+                    request.language = payload['language']
+                else:
+                    request.language = "fr"
 
                 return None
             except jwt.ExpiredSignatureError:

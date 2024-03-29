@@ -45,6 +45,8 @@ def prepare_prompt(user_inputs):
         Args:
             user_inputs (dict): Dict of every user inputs
     """
+    language = "french" if user_inputs['language'] == "fr" else "english"
+
     system_prompt = """
     You are an expert in backpacking travels and travels in general
     Generate a personalized travel itinerary based on user inputs
@@ -53,13 +55,14 @@ def prepare_prompt(user_inputs):
     """
 
     system_prompt += f"""
-    Each step should include {N_MAX_ACTIVITIES} activities or points of interest If 'Multiple Cities' is set to 'True' else only return an itinerary about the 'starting City' and activities near it
+    Each step should include a minimum of {N_MAX_ACTIVITIES} activities or points of interest If 'Multiple Cities' is set to 'True' else only return an itinerary about the 'starting City' and activities near it
     The itinerary must include steps with different cities and must start at the 'starting City' and the 'endingCity' must be the last step
     If no 'starting City' sets the last step must be the same as the 'starting City'
     The itinerary should align with the user's interests and if the user has set 'Traveling with Children' to 'True' add a few kid-friendly activities else don't
     Ensure no repeated visits to the same place and suggest a national restaurant at least once a day
     Also, provide latitude and longitude in decimal degrees for every place to visit
     latitude must come first then longitude
+    The value must be in {language}
     expected JSON format:
     {{
       "country": "[Country]",
@@ -82,8 +85,8 @@ def prepare_prompt(user_inputs):
     }}
     """
 
-    if not user_inputs['steps']:
-        system_prompt += f" Generate the JSON itinerary with {N_MAX_STEPS} steps"
+    if user_inputs.get('steps') is None:
+        system_prompt += f" Generate the JSON itinerary with a minimum of {N_MAX_STEPS} steps"
 
     tmp_types = []
     for travel_type in user_inputs['types']:

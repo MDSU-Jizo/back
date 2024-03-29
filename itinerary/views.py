@@ -218,6 +218,7 @@ def create_itinerary(request) -> JsonResponse:
     content = json.loads(request.body.decode('utf-8'))
 
     content['user'] = request.user_id
+    content['language'] = request.language
     form = ItineraryForm(content)
 
     if not form.is_valid():
