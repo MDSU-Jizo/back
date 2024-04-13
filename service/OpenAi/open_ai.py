@@ -58,7 +58,7 @@ Generate a personalized travel itinerary based on user inputs for a backpacking 
 Your task is to craft an itinerary tailored to the user's preferences, 
 including the duration of the trip for each step, 
 locations to visit, and points of interest. Each step should contain a minimum of {N_MAX_ACTIVITIES} activities or points of interest.
-If 'multiple_cities' is set to 'True', the itinerary should cover multiple cities; 
+If 'multiple_cities' is set to 'True' or it has an 'ending_city' different from 'starting_city', the itinerary should cover multiple cities; 
 otherwise, focus on the 'starting_city'. 
 Ensure a minimum of {N_MAX_STEPS} steps and/or {N_MAX_ACTIVITIES} activities close to the starting city that fit the trip's duration. 
 The itinerary must start at the 'starting_city' and end at the 'ending_city', 
