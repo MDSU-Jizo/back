@@ -21,7 +21,7 @@ elastic-transport==8.4.0
 elasticsearch==8.9.0
 elasticsearch-django==8.4
 frozenlist==1.4.0
-gunicorn==21.2.0
+gunicorn==22.0.0
 idna==3.4
 isort==5.12.0
 itypes==1.2.0
