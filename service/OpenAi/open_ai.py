@@ -54,6 +54,7 @@ def prepare_prompt(user_inputs):
     language = "french" if user_inputs['language'] == "fr" else "english"
 
     system_prompt = f"""
+Forget every previous prompt.
 Generate a personalized travel itinerary based on user inputs for a backpacking trip. 
 Your task is to craft an itinerary tailored to the user's preferences, 
 including the duration of the trip for each step, 
