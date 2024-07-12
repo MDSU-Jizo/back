@@ -1,13 +1,14 @@
 import os
 import json
 import openai
+from asgiref.sync import sync_to_async
 
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
 
 from itinerary_type.forms import ItineraryTypeForm
 from service.verify_method import verify_method
-from service.OpenAi.open_ai import prepare_prompt
+from service.ai_handler import send_to_ai
 from service.api_response import send_json_response as api_response
 from contract.constants import Constants
 from .models import Itinerary, get_itineraries_with_types_and_interests, get_itinerary_with_types_and_interests, \
@@ -46,7 +47,7 @@ def get_period_delta(start_date, end_date) -> int or False:
     return period.days
 
 
-def link_interests_to_itinerary(request, interests, itinerary) -> True or JsonResponse:
+async def link_interests_to_itinerary(request, interests, itinerary) -> True or JsonResponse:
     """
         Function to define interests in the given itinerary
 
@@ -68,7 +69,7 @@ def link_interests_to_itinerary(request, interests, itinerary) -> True or JsonRe
 
         itinerary_interest_form = ItineraryInterestForm(data)
 
-        if not itinerary_interest_form.is_valid():
+        if not await sync_to_async(itinerary_interest_form.is_valid)():
             return api_response(
                 code=HttpCode.INTERNAL_SERVER_ERROR,
                 result='error',
@@ -78,12 +79,12 @@ def link_interests_to_itinerary(request, interests, itinerary) -> True or JsonRe
                 payload=interests
             )
 
-        itinerary_interest_form.save()
+        await sync_to_async(itinerary_interest_form.save)()
 
     return True
 
 
-def link_types_to_itinerary(request, types, itinerary) -> True or JsonResponse:
+async def link_types_to_itinerary(request, types, itinerary) -> True or JsonResponse:
     """
         Function to define interests in the given itinerary
 
@@ -105,7 +106,7 @@ def link_types_to_itinerary(request, types, itinerary) -> True or JsonResponse:
 
         itinerary_type_form = ItineraryTypeForm(data)
 
-        if not itinerary_type_form.is_valid():
+        if not await sync_to_async(itinerary_type_form.is_valid)():
             return api_response(
                 code=HttpCode.INTERNAL_SERVER_ERROR,
                 result='error',
@@ -115,7 +116,7 @@ def link_types_to_itinerary(request, types, itinerary) -> True or JsonResponse:
                 payload=types
             )
 
-        itinerary_type_form.save()
+        await sync_to_async(itinerary_type_form.save)()
 
     return True
 
@@ -193,16 +194,16 @@ def get_itinerary(request, itinerary_id):
     return api_response(HttpCode.SUCCESS, 'success', data=normalizer)
 
 
-def create_itinerary(request) -> JsonResponse:
+async def create_itinerary(request) -> JsonResponse:
     """
-        Function to create an itinerary
+    Function to create an itinerary
 
-        Args:
-            request
-        Requires:
-            body: JSON
-        Returns:
-            JsonResponse
+    Args:
+        request
+    Requires:
+        body: JSON
+    Returns:
+        JsonResponse
     """
     has_method = verify_method(expected_method='POST', requested_method=request.method, requested_path=request.path)
     if isinstance(has_method, JsonResponse):
@@ -222,7 +223,7 @@ def create_itinerary(request) -> JsonResponse:
     content['language'] = request.language
     form = ItineraryForm(content)
 
-    if not form.is_valid():
+    if not await sync_to_async(form.is_valid)():
         return api_response(
             code=HttpCode.INTERNAL_SERVER_ERROR,
             result='error',
@@ -232,10 +233,10 @@ def create_itinerary(request) -> JsonResponse:
             payload=content
         )
 
-    count = Itinerary.objects.filter(user_id=request.user_id).count()
+    count = await sync_to_async(Itinerary.objects.filter(user_id=request.user_id).count)()
 
     if count >= LIMIT and request.role['id'] == Constants.Roles.ROLE_USER.value:
-        user = User.objects.get(pk=request.user_id)
+        user = await sync_to_async(User.objects.get)(pk=request.user_id)
         today = date.today()
         if user.time_before_creating and user.time_before_creating > today:
             return api_response(
@@ -254,7 +255,7 @@ def create_itinerary(request) -> JsonResponse:
             payload=content
         )
 
-    itinerary = form.save()
+    itinerary = await sync_to_async(form.save)()
 
     if "interests" not in content:
         return api_response(
@@ -265,7 +266,7 @@ def create_itinerary(request) -> JsonResponse:
             payload=content
         )
 
-    interests = link_interests_to_itinerary(request, content['interests'], itinerary.id)
+    interests = await link_interests_to_itinerary(request, content['interests'], itinerary.id)
 
     if interests is not True:
         return interests
@@ -280,7 +281,7 @@ def create_itinerary(request) -> JsonResponse:
         )
 
     for trip_type in content['types']:
-        if (trip_type in [Types.ROADTRIP.value, Types.BACKPACKING.value]
+        if (trip_type in [Constants.Types.ROADTRIP.value, Constants.Types.BACKPACKING.value]
                 and "level" not in content):
             return api_response(
                 code=HttpCode.BAD_REQUEST,
@@ -290,7 +291,7 @@ def create_itinerary(request) -> JsonResponse:
                 payload=content
             )
 
-    types = link_types_to_itinerary(request, content['types'], itinerary.id)
+    types = await link_types_to_itinerary(request, content['types'], itinerary.id)
 
     if types is not True:
         return types
@@ -314,7 +315,7 @@ def create_itinerary(request) -> JsonResponse:
 
     if request.GET.get('test'):
         itinerary.response = MockUps.openai_response
-        itinerary.save()
+        await sync_to_async(itinerary.save)()
 
         return api_response(
             code=HttpCode.CREATED,
@@ -323,10 +324,10 @@ def create_itinerary(request) -> JsonResponse:
             data=MockUps.openai_response
         )
 
-    response = prepare_prompt(user_inputs=content)
+    response = await send_to_ai(user_inputs=content)
 
     if isinstance(response, openai.BadRequestError):
-        itinerary.delete()
+        await sync_to_async(itinerary.delete)()
 
         return api_response(
             code=HttpCode.INTERNAL_SERVER_ERROR,
@@ -336,16 +337,16 @@ def create_itinerary(request) -> JsonResponse:
         )
 
     try:
-        itinerary.response = json.loads(response.choices[0].message.content)
-        itinerary.save()
+        itinerary.response = json.loads(response)
+        await sync_to_async(itinerary.save)()
     except json.decoder.JSONDecodeError:
-        itinerary.delete()
+        await sync_to_async(itinerary.delete)()
 
         return api_response(
             code=HttpCode.INTERNAL_SERVER_ERROR,
             result='error',
             message='The AI could not generate the steps, the itinerary has not been created. Try again.',
-            data=response.choices[0].message.content
+            data=response
         )
 
     return api_response(
